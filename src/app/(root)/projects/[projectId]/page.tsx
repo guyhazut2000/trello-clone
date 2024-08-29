@@ -4,7 +4,6 @@ import { Label } from "@/components/ui/label";
 import { ListTodo } from "lucide-react";
 import { getListsByProjectId } from "@/data-access/lists";
 import { CreateProjectListSheet } from "../_components/create-project-list-sheet";
-import { Button } from "@/components/ui/button";
 
 const ProjectPage = async ({ params }: { params: { projectId: string } }) => {
   const project = await getProjectById(params.projectId);
@@ -18,13 +17,13 @@ const ProjectPage = async ({ params }: { params: { projectId: string } }) => {
 
       <div className="flex flex-col gap-4">
         <div>
-          <Label>description:</Label>
+          <Label>תיאור:</Label>
           <p>{project?.description}</p>
         </div>
         <div className="flex gap-2 items-center justify-between">
           <div className="flex gap-x-2 items-center">
             <ListTodo className="w-5 h-5" />
-            Work items
+            פריטי עבודה
           </div>
           <CreateProjectListSheet
             projectId={params.projectId}
@@ -32,20 +31,31 @@ const ProjectPage = async ({ params }: { params: { projectId: string } }) => {
           />
         </div>
         <section className="mt-10">
-          {lists.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {lists?.map((list) => (
+          <div className="flex overflow-x-auto gap-4 pb-4">
+            {lists.length > 0 ? (
+              lists?.map((list) => (
                 <div
                   key={list.id}
-                  className="bg-gray-100 rounded-sm flex gap-2 items-start"
+                  className="bg-gray-50 rounded-sm flex flex-col gap-2 p-4 min-w-[250px]"
                 >
-                  {list.title}
+                  <h3 className="font-semibold">{list.title}</h3>
+                  <div className="space-y-2">
+                    <div>
+                      {list.tasks.map((task) => {
+                        return <p key={task.id}>{task.title}</p>;
+                      })}
+                    </div>
+                  </div>
+                  <CreateTaskSheet
+                    listId={list.id}
+                    projectId={params.projectId}
+                  />
                 </div>
-              ))}
-            </div>
-          ) : (
-            <CreateProjectListSheet projectId={params.projectId} />
-          )}
+              ))
+            ) : (
+              <CreateProjectListSheet projectId={params.projectId} />
+            )}
+          </div>
         </section>
       </div>
     </div>

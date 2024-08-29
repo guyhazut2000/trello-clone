@@ -3,11 +3,9 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
-import { CreateProjectListBody } from "@/types";
-import { createProject } from "@/data-access/projects";
+import { createList, getListsByProjectId } from "@/data-access/lists";
 
 import { createProjectListSchema } from "../validation";
-import { createList, getListsByProjectId } from "@/data-access/lists";
 
 export const createProjectListAction = async (
   projectId: string,

@@ -8,3 +8,7 @@ export const createProjectSchema = z.object({
 export const createProjectListSchema = z.object({
   title: z.string(),
 });
+
+export const createTaskSchema = z.object({
+  title: z.string(),
+});

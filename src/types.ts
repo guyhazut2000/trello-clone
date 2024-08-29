@@ -1,4 +1,4 @@
-import { Project, List } from "@prisma/client";
+import { Project, List, Task } from "@prisma/client";
 
 // Project
 export type ProjectList = Project[] | null;
@@ -7,4 +7,8 @@ export type CreateProjectBody = Pick<ProjectItem, "title" | "description">;
 
 // List
 export type ListItem = List;
-export type CreateProjectListBody = Pick<ListItem, "title" | "position">;
+export type CreateListBody = Pick<ListItem, "title" | "position">;
+
+// Tasks
+export type TaskItem = Task;
+export type CreateTaskBody = Pick<TaskItem, "title" | "position" | "listId">;

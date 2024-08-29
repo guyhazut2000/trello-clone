@@ -33,8 +33,8 @@ export const CreateProjectListSheet = ({
             type === "button" && buttonVariants({ variant: "ghost" })
           )}
         >
-          <PlusIcon className="w-4 h-4 mr-2" />
           Create New List
+          <PlusIcon className="w-4 h-4 ml-2" />
         </Button>
       </SheetTrigger>
       <SheetContent className="space-y-4">
