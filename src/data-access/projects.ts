@@ -20,6 +20,12 @@ export const getProjects = async (options?: GetProjectOptions) => {
   });
 };
 
+export const getProjectById = async (projectId: string) => {
+  return await prisma.project.findUnique({
+    where: { id: projectId },
+  });
+};
+
 export const createProject = async (project: CreateProjectBody) => {
   return await prisma.project.create({
     data: project,

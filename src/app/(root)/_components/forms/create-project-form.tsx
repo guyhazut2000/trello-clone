@@ -20,8 +20,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/submit-button";
 
-import { createProjectAction } from "../../_actions/create-project-action";
 import { createProjectSchema } from "../../projects/validation";
+import { createProjectAction } from "../../projects/_actions/create-project-action";
 
 export const CreateProjectForm = () => {
   const [showSheet, setShowSheet] = useState(false);
