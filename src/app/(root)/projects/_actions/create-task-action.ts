@@ -22,6 +22,7 @@ export const createTaskAction = async (
 
   // Fetch the list by its ID
   const list = await getListById(listId);
+  console.log(list);
 
   if (!list) {
     throw new Error("List not found");

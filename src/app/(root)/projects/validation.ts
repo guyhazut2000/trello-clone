@@ -12,3 +12,16 @@ export const createProjectListSchema = z.object({
 export const createTaskSchema = z.object({
   title: z.string(),
 });
+
+export const updateListOrderSchema = z.object({
+  tasks: z.array(
+    z.object({
+      id: z.string(),
+      title: z.string(),
+      position: z.number(),
+      createdAt: z.date(),
+      updatedAt: z.date(),
+    })
+  ),
+  projectId: z.string(),
+});

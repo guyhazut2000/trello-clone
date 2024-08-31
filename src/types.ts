@@ -11,6 +11,7 @@ export type ListItem = List & {
   tasks: TaskItem[];
 };
 export type CreateListBody = Pick<ListItem, "title" | "position">;
+export type UpdateListOrder = ListItem[];
 
 // Tasks
 export type TaskItem = Task;

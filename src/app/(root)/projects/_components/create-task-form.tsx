@@ -44,8 +44,8 @@ export const CreateTaskForm = ({
     try {
       startTransition(async () => {
         const { data, success } = await createTaskAction(
-          listId,
           projectId,
+          listId,
           values
         );
         if (success) {

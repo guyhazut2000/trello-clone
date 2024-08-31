@@ -1,7 +1,8 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { CreateProjectBody } from "@/types";
+import { CreateProjectBody, ProjectItem } from "@/types";
+import { Prisma } from "@prisma/client";
 
 type GetProjectOptions = {
   order?: "asc" | "desc";
@@ -30,5 +31,15 @@ export const getProjectById = async (projectId: string) => {
 export const createProject = async (project: CreateProjectBody) => {
   return await prisma.project.create({
     data: project,
+  });
+};
+
+export const updateProjectById = async (
+  projectId: string,
+  projectData: Partial<Omit<ProjectItem, "lists">>
+) => {
+  return await prisma.project.update({
+    where: { id: projectId },
+    data: projectData,
   });
 };

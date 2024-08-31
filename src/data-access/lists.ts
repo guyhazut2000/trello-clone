@@ -1,5 +1,5 @@
 import prisma from "@/lib/db";
-import { CreateListBody } from "@/types";
+import { CreateListBody, ListItem } from "@/types";
 
 export const getListsByProjectId = async (projectId: string) => {
   return await prisma.list.findMany({
@@ -39,4 +39,11 @@ export const deleteListWithTasks = async (id: string) => {
       where: { id },
     }),
   ]);
+};
+
+export const updateListOrder = async (list: Omit<ListItem, "tasks">) => {
+  return await prisma.list.update({
+    where: { projectId: list.projectId, id: list.id },
+    data: list,
+  });
 };
