@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import { PlusIcon } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button, buttonVariants } from "@/components/ui/button";
 import {
@@ -24,8 +26,10 @@ export const CreateProjectListSheet = ({
   projectId,
   type = "default",
 }: CreateProjectListSheetProps) => {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>
         <Button
           className={cn(
@@ -33,8 +37,8 @@ export const CreateProjectListSheet = ({
             type === "button" && buttonVariants({ variant: "ghost" })
           )}
         >
+          <PlusIcon className="w-4 h-4 mr-2" />
           Create New List
-          <PlusIcon className="w-4 h-4 ml-2" />
         </Button>
       </SheetTrigger>
       <SheetContent className="space-y-4">
@@ -45,7 +49,7 @@ export const CreateProjectListSheet = ({
             your tasks. You can later move tasks between lists.
           </SheetDescription>
         </SheetHeader>
-        <CreateProjectListForm projectId={projectId} />
+        <CreateProjectListForm projectId={projectId} setSheetOpen={setIsOpen} />
       </SheetContent>
     </Sheet>
   );

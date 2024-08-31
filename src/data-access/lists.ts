@@ -12,6 +12,15 @@ export const getListsByProjectId = async (projectId: string) => {
   });
 };
 
+export const getListById = async (id: string) => {
+  return await prisma.list.findUnique({
+    where: { id },
+    include: {
+      tasks: true,
+    },
+  });
+};
+
 export const createList = async (projectId: string, list: CreateListBody) => {
   return await prisma.list.create({
     data: {
@@ -21,11 +30,13 @@ export const createList = async (projectId: string, list: CreateListBody) => {
   });
 };
 
-export const getListById = async (id: string) => {
-  return await prisma.list.findUnique({
-    where: { id },
-    include: {
-      tasks: true,
-    },
-  });
+export const deleteListWithTasks = async (id: string) => {
+  return await prisma.$transaction([
+    prisma.task.deleteMany({
+      where: { listId: id },
+    }),
+    prisma.list.delete({
+      where: { id },
+    }),
+  ]);
 };

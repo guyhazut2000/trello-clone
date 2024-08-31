@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useTransition } from "react";
+import { toast } from "sonner";
 
 import {
   Form,
@@ -18,7 +19,6 @@ import { SubmitButton } from "@/components/submit-button";
 
 import { createTaskSchema } from "../validation";
 import { createTaskAction } from "../_actions/create-task-action";
-import { toast } from "sonner";
 
 interface CreateTaskFormProps {
   listId: string;
@@ -27,8 +27,8 @@ interface CreateTaskFormProps {
 }
 
 export const CreateTaskForm = ({
-  projectId,
   listId,
+  projectId,
   setSheetOpen,
 }: CreateTaskFormProps) => {
   const [isPending, startTransition] = useTransition();
@@ -41,30 +41,28 @@ export const CreateTaskForm = ({
   });
 
   const handleCreateTask = async (values: z.infer<typeof createTaskSchema>) => {
-    console.log(values);
     try {
       startTransition(async () => {
         const { data, success } = await createTaskAction(
-          projectId,
           listId,
+          projectId,
           values
         );
-
         if (success) {
-          form.reset();
-          toast.success("Task created successfully");
+          toast.success("Task created successfully!");
           setSheetOpen(false);
+        } else {
+          toast.error("Failed to create task");
         }
       });
     } catch (err) {
-      console.log(err);
+      toast.error("Failed to create task");
     }
   };
 
   return (
     <Form {...form}>
       <form
-        autoFocus={false}
         className="space-y-4"
         onSubmit={form.handleSubmit(handleCreateTask)}
       >

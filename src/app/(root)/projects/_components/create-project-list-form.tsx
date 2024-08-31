@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useTransition } from "react";
+import { toast } from "sonner";
 
 import {
   Form,
@@ -17,14 +18,16 @@ import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/submit-button";
 
 import { createProjectListSchema } from "../validation";
-import { createProjectListAction } from "../_actions/create-project-list-action";
+import { createProjectListAction } from "../_actions/create-list-action";
 
 interface CreateProjectListFormProps {
   projectId: string;
+  setSheetOpen: (open: boolean) => void;
 }
 
 export const CreateProjectListForm = ({
   projectId,
+  setSheetOpen,
 }: CreateProjectListFormProps) => {
   const [isPending, startTransition] = useTransition();
 
@@ -38,16 +41,21 @@ export const CreateProjectListForm = ({
   const handleCreateProjectList = async (
     values: z.infer<typeof createProjectListSchema>
   ) => {
-    console.log(values);
     try {
       startTransition(async () => {
         const { data, success } = await createProjectListAction(
           projectId,
           values
         );
+        if (success) {
+          toast.success("List created successfully!");
+          setSheetOpen(false);
+        } else {
+          toast.error("Failed to create list");
+        }
       });
     } catch (err) {
-      console.log(err);
+      toast.error("Failed to create list");
     }
   };
 
