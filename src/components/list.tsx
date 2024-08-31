@@ -3,19 +3,10 @@
 import React from "react";
 import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { Task } from "./task";
-
-interface TaskItem {
-  id: string;
-  content: string;
-}
-
-interface List {
-  id: string;
-  title: string;
-}
+import { ListItem, TaskItem } from "@/types";
 
 interface ListProps {
-  list: List;
+  list: ListItem;
   tasks: TaskItem[];
   index: number;
 }

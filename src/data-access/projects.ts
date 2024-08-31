@@ -17,6 +17,7 @@ export const getProjects = async (options?: GetProjectOptions) => {
     orderBy: {
       [sort]: order,
     },
+    include: { lists: { include: { tasks: true } } }, // Include related lists and tasks
   });
 };
 

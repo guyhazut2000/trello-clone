@@ -2,14 +2,10 @@
 
 import React from "react";
 import { DraggableProvided } from "@hello-pangea/dnd";
-
-interface Task {
-  id: string;
-  content: string;
-}
+import { TaskItem } from "@/types";
 
 interface TaskProps {
-  task: Task;
+  task: TaskItem;
   index: number;
   provided: DraggableProvided;
   isDragging: boolean;
@@ -31,7 +27,7 @@ export const Task = ({ task, index, provided, isDragging }: TaskProps) => {
       }}
       className="task-item"
     >
-      {task.content}
+      {task.title}
     </div>
   );
 };

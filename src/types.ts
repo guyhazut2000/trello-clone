@@ -1,12 +1,15 @@
 import { Project, List, Task } from "@prisma/client";
 
 // Project
-export type ProjectList = Project[] | null;
-export type ProjectItem = Project;
+export type ProjectItem = Project & {
+  lists: ListItem[];
+};
 export type CreateProjectBody = Pick<ProjectItem, "title" | "description">;
 
 // List
-export type ListItem = List;
+export type ListItem = List & {
+  tasks: TaskItem[];
+};
 export type CreateListBody = Pick<ListItem, "title" | "position">;
 
 // Tasks

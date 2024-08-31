@@ -4,6 +4,8 @@ import { Trash2 } from "lucide-react";
 import { useTransition } from "react";
 import { toast } from "sonner";
 
+import { Loader } from "@/components/loader";
+
 import { deleteListAction } from "../_actions/delete-list-action";
 
 interface DeleteListButtonProps {
@@ -21,6 +23,7 @@ export const DeleteListButton = ({
     try {
       startTransition(async () => {
         const { success, error } = await deleteListAction(projectId, listId);
+
         if (success) {
           toast.success("List deleted successfully!");
         } else {
@@ -38,7 +41,7 @@ export const DeleteListButton = ({
       onClick={handleDeleteList}
       className="text-red-500 hover:text-red-700 transition-colors duration-200"
     >
-      <Trash2 className="w-5 h-5" />
+      {isPending ? <Loader /> : <Trash2 className="w-5 h-5" />}
     </button>
   );
 };

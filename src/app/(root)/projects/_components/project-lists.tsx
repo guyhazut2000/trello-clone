@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { ChevronRight } from "lucide-react";
 
 import { CreateTaskSheet } from "./create-task-sheet";
@@ -12,12 +11,7 @@ interface ProjectListsProps {
   projectId: string;
 }
 
-export const ProjectLists = ({
-  lists: initialLists,
-  projectId,
-}: ProjectListsProps) => {
-  const [lists, setLists] = useState(initialLists);
-
+export const ProjectLists = ({ lists, projectId }: ProjectListsProps) => {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {lists.length > 0 ? (

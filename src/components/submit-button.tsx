@@ -1,11 +1,11 @@
 "use client";
 
 import { ButtonHTMLAttributes } from "react";
-import { useFormStatus } from "react-dom";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { Loader } from "lucide-react";
+
+import { Loader } from "./loader";
 
 interface SubmitButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   idleText: string;
@@ -30,7 +30,7 @@ export function SubmitButton({
       {pending ? (
         <div className="flex justify-center items-center gap-2">
           <span>{submittingText}</span>
-          <Loader className="animate-spin repeat-infinite" />
+          <Loader />
         </div>
       ) : (
         idleText

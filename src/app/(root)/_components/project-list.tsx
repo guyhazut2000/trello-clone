@@ -1,16 +1,14 @@
 "use server";
 
 import { partition } from "lodash";
-import { Layers, Pin, User2 } from "lucide-react";
+import { Layers, Pin } from "lucide-react";
 
-import { ProjectItem, ProjectList as Projects } from "@/types";
+import { ProjectItem } from "@/types";
 
 import { ProjectCard } from "./project-card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Suspense } from "react";
 
 interface ProjectListProps {
-  projects: Projects;
+  projects: ProjectItem[];
 }
 
 const isPinnedPredicate = (project: ProjectItem): boolean => project.isPinned;
