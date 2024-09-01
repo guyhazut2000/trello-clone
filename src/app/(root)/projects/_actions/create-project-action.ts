@@ -5,8 +5,8 @@ import { z } from "zod";
 import { CreateProjectBody } from "@/types";
 import { createProject } from "@/data-access/projects";
 
-import { createProjectSchema } from "../projects/validation";
 import { revalidatePath } from "next/cache";
+import { createProjectSchema } from "../validation";
 
 export const createProjectAction = async (
   values: z.infer<typeof createProjectSchema>

@@ -19,6 +19,11 @@ import { ProjectItem } from "@/types";
 
 import { ProjectProgressBar } from "./project-progress-bar";
 import { Button } from "@/components/ui/button";
+import { useTransition } from "react";
+import { toast } from "sonner";
+import { TogglePinProjectAction } from "../projects/_actions/toggle-pin-project-action";
+import { Loader } from "@/components/loader";
+import { deleteProjectAction } from "../projects/_actions/delete-project-action";
 
 interface ProjectCardProps {
   project: ProjectItem;
@@ -48,7 +53,7 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
           onClick={handleMoreClick}
           className="absolute right-4 top-4 p-2 cursor-pointer hover:bg-gray-100 rounded-lg"
         >
-          <CardOptions />
+          <CardOptions projectId={project.id} isPinned={project.isPinned} />
         </span>
       </CardHeader>
       <CardContent>
@@ -62,7 +67,41 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
   );
 };
 
-const CardOptions = () => {
+interface CardOptionsProps {
+  projectId: string;
+  isPinned: boolean;
+}
+
+const CardOptions = ({ projectId, isPinned }: CardOptionsProps) => {
+  const [isPending, startTransition] = useTransition();
+  const [isDeletePending, startDeleteTransition] = useTransition();
+
+  const handleMarkProjectAsPinned = async () => {
+    try {
+      startTransition(async () => {
+        const { success, error } = await TogglePinProjectAction(projectId);
+        if (success) {
+          toast.success("Project pinned successfully!");
+        } else {
+          toast.error(error || "Failed to pin project");
+        }
+      });
+    } catch (error) {}
+  };
+
+  const handleDeleteProject = async () => {
+    try {
+      startDeleteTransition(async () => {
+        const { success, error } = await deleteProjectAction(projectId);
+        if (success) {
+          toast.success("Project Deleted successfully!");
+        } else {
+          toast.error(error || "Failed to delete project");
+        }
+      });
+    } catch (error) {}
+  };
+
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -73,18 +112,34 @@ const CardOptions = () => {
         className="w-[200px] space-y-2 flex flex-col"
       >
         <Button
+          disabled={isPending}
+          onClick={handleMarkProjectAsPinned}
           className="flex gap-x-2 items-center justify-start p-1"
           variant="popover"
         >
-          <Pin className="h-4 w-4" />
-          <p>Pin project</p>
+          {isPending ? (
+            <Loader />
+          ) : (
+            <>
+              <Pin className="h-4 w-4" />
+              <span>{isPinned ? "Un Pin" : "Pin"}</span>
+            </>
+          )}
         </Button>
         <Button
+          disabled={isPending}
+          onClick={handleDeleteProject}
           variant="popover"
           className="flex gap-x-2 items-center justify-start text-red-500 hover:text-red-500 p-1"
         >
-          <Trash2 className="h-4 w-4" />
-          <p>Delete project</p>
+          {isDeletePending ? (
+            <Loader />
+          ) : (
+            <>
+              <Trash2 className="h-4 w-4" />
+              <p>Delete project</p>
+            </>
+          )}
         </Button>
       </PopoverContent>
     </Popover>

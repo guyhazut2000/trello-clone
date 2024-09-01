@@ -17,45 +17,46 @@ import {
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/submit-button";
 
-import { createProjectListSchema } from "../validation";
-import { createProjectListAction } from "../_actions/create-list-action";
+import { createTaskSchema } from "../validation";
+import { createTaskAction } from "../_actions/create-task-action";
 
-interface CreateProjectListFormProps {
+interface CreateTaskFormProps {
+  listId: string;
   projectId: string;
   setSheetOpen: (open: boolean) => void;
 }
 
-export const CreateProjectListForm = ({
+export const CreateTaskForm = ({
+  listId,
   projectId,
   setSheetOpen,
-}: CreateProjectListFormProps) => {
+}: CreateTaskFormProps) => {
   const [isPending, startTransition] = useTransition();
 
-  const form = useForm<z.infer<typeof createProjectListSchema>>({
-    resolver: zodResolver(createProjectListSchema),
+  const form = useForm<z.infer<typeof createTaskSchema>>({
+    resolver: zodResolver(createTaskSchema),
     defaultValues: {
       title: "",
     },
   });
 
-  const handleCreateProjectList = async (
-    values: z.infer<typeof createProjectListSchema>
-  ) => {
+  const handleCreateTask = async (values: z.infer<typeof createTaskSchema>) => {
     try {
       startTransition(async () => {
-        const { data, success } = await createProjectListAction(
+        const { data, success } = await createTaskAction(
           projectId,
+          listId,
           values
         );
         if (success) {
-          toast.success("List created successfully!");
+          toast.success("Task created successfully!");
           setSheetOpen(false);
         } else {
-          toast.error("Failed to create list");
+          toast.error("Failed to create task");
         }
       });
     } catch (err) {
-      toast.error("Failed to create list");
+      toast.error("Failed to create task");
     }
   };
 
@@ -63,7 +64,7 @@ export const CreateProjectListForm = ({
     <Form {...form}>
       <form
         className="space-y-4"
-        onSubmit={form.handleSubmit(handleCreateProjectList)}
+        onSubmit={form.handleSubmit(handleCreateTask)}
       >
         <FormField
           control={form.control}
@@ -72,7 +73,7 @@ export const CreateProjectListForm = ({
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input placeholder="List title" {...field} />
+                <Input placeholder="Task title" {...field} />
               </FormControl>
 
               <FormMessage />
@@ -81,7 +82,7 @@ export const CreateProjectListForm = ({
         />
 
         <SubmitButton
-          idleText="Create List"
+          idleText="Create Task"
           pending={isPending}
           submittingText="Creating..."
         />
