@@ -1,8 +1,9 @@
-import { Navbar } from "@/components/navbar";
-import { Sidebar } from "@/components/sidebar";
 import React, { ReactNode } from "react";
 
-const RootLayout = ({ children }: { children: ReactNode }) => {
+import { Navbar } from "@/components/navbar";
+import { Sidebar } from "@/components/sidebar";
+
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <main className="min-h-screen flex flex-col max-w-6xl 2xl:max-w-screen-2xl mx-auto">
       <Navbar />
@@ -14,6 +15,4 @@ const RootLayout = ({ children }: { children: ReactNode }) => {
       </div>
     </main>
   );
-};
-
-export default RootLayout;
+}

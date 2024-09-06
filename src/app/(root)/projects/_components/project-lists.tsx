@@ -7,29 +7,32 @@ import {
   DragDropContext,
   DropResult,
 } from "@hello-pangea/dnd";
+import { useState } from "react";
+
+import { ListItem } from "@/types";
+import { toast } from "sonner";
+import { sortListByPosition, sortTasksByPosition } from "@/lib/utils";
 
 import { CreateTaskSheet } from "./create-task-sheet";
 import { DeleteListButton } from "./delete-list-button";
-import { CreateProjectListSheet } from "./create-project-list-sheet";
-import { ListItem, TaskItem } from "@/types";
 import { updateListOrderAction } from "../_actions/update-list-order-action";
+import { updateTaskOrderAction } from "../_actions/update-task-order-action";
+import { deleteTaskAction } from "../_actions/delete-task-action";
+import { createTaskAction } from "../_actions/create-task-action";
 
 interface ProjectListsProps {
-  lists: ListItem[];
+  initialLists: ListItem[];
   projectId: string;
 }
 
-const sortListByPosition = (a: ListItem, b: ListItem) => {
-  return a.position - b.position;
-};
+export const ProjectLists = ({
+  initialLists,
+  projectId,
+}: ProjectListsProps) => {
+  const [lists, setLists] = useState(initialLists);
 
-const sortTasksByPosition = (a: TaskItem, b: TaskItem) => {
-  return a.position - b.position;
-};
-
-export const ProjectLists = ({ lists, projectId }: ProjectListsProps) => {
   const handleDragEnd = async (result: DropResult) => {
-    const { destination, source, type, draggableId } = result;
+    const { destination, source, type } = result;
 
     if (!destination) return;
 
@@ -40,25 +43,46 @@ export const ProjectLists = ({ lists, projectId }: ProjectListsProps) => {
     )
       return;
 
-    // User move a list
-    if (type === "LIST") {
-      reorder(lists, source.index, destination.index).map((item, index) => ({
-        ...item,
-        position: index,
-      }));
+    // Prepare for optimistic updates
+    let updatedLists = [...lists];
 
-      // Dispatch server action
-      await updateListOrderAction({ projectId, tasks: lists });
-      console.log(lists);
+    if (type === "LIST") {
+      const reorderedList = reorder(
+        updatedLists,
+        source.index,
+        destination.index
+      ).map((item, index) => ({ ...item, position: index }));
+
+      // Optimistically update the UI
+      setLists(reorderedList);
+
+      // Dispatch server action to update list position
+      try {
+        const { error, success } = await updateListOrderAction(
+          projectId,
+          reorderedList
+        );
+
+        if (success) {
+          toast.success("List updated successfully");
+        } else {
+          toast.error(error || "Failed to update list");
+          setLists(lists);
+        }
+      } catch (err) {
+        toast.error("Failed to update list");
+        // Rollback the optimistic update if needed
+        setLists(lists);
+      }
     }
 
     if (type === "TASK") {
       const sourceList = lists.find((l) => l.id === source.droppableId);
-      const DestinationList = lists.find(
+      const destinationList = lists.find(
         (l) => l.id === destination.droppableId
       );
 
-      if (!sourceList || !DestinationList) {
+      if (!sourceList || !destinationList) {
         return;
       }
 
@@ -66,8 +90,8 @@ export const ProjectLists = ({ lists, projectId }: ProjectListsProps) => {
         sourceList.tasks = [];
       }
 
-      if (!DestinationList.tasks) {
-        DestinationList.tasks = [];
+      if (!destinationList.tasks) {
+        destinationList.tasks = [];
       }
 
       // Reorder the task in the same list
@@ -82,27 +106,64 @@ export const ProjectLists = ({ lists, projectId }: ProjectListsProps) => {
         }));
 
         sourceList.tasks = reorderedTasks;
-        console.log(sourceList);
-        // Dispatch server action
+
+        const listId = destination.droppableId;
+
+        const { error, success } = await updateTaskOrderAction(
+          projectId,
+          listId,
+          reorderedTasks
+        );
+
+        if (success) {
+          toast.success("Task position updated successfully");
+        } else {
+          toast.error(error || "Failed to update task position");
+          setLists(lists);
+        }
 
         // User move the task to another list
       } else {
         const [movedTask] = sourceList.tasks.splice(source.index, 1);
 
+        // Update the task's listId to the destination
         movedTask.listId = destination.droppableId;
-        DestinationList.tasks.splice(destination.index, 0, movedTask);
 
+        // Add the task to the destination list
+        destinationList.tasks.splice(destination.index, 0, movedTask);
+
+        // Update positions in the source list
         sourceList.tasks.forEach((task, index) => {
           task.position = index;
         });
 
-        DestinationList.tasks.forEach((task, index) => {
+        // Update positions in the destination list
+        destinationList.tasks.forEach((task, index) => {
           task.position = index;
         });
+
+        // Optimistically update the UI
+        setLists([...updatedLists]);
+
+        // Dispatch the server action to update both lists
+        try {
+          await Promise.all([
+            updateTaskOrderAction(projectId, sourceList.id, sourceList.tasks),
+            updateTaskOrderAction(
+              projectId,
+              destinationList.id,
+              destinationList.tasks
+            ),
+          ]);
+
+          toast.success("Task moved successfully!");
+        } catch (error) {
+          // If something goes wrong, rollback the changes
+          toast.error("Failed to move the task.");
+          setLists(lists); // Rollback to the previous state
+        }
       }
     }
-
-    // Add logic to update the positions of lists and tasks in your state and/or backend
   };
 
   const reorder = (list: any[], startIndex: number, lastIndex: number) => {
@@ -124,11 +185,7 @@ export const ProjectLists = ({ lists, projectId }: ProjectListsProps) => {
           >
             {lists.length > 0 ? (
               lists.sort(sortListByPosition).map((list, index) => (
-                <Draggable
-                  key={list.id}
-                  draggableId={`list-${list.id}`}
-                  index={index}
-                >
+                <Draggable key={list.id} draggableId={list.id} index={index}>
                   {(provided) => (
                     <div
                       className="bg-gray-50 rounded-lg shadow-md flex flex-col gap-3 p-4 transition-all duration-300 ease-in-out hover:shadow-lg"
@@ -146,7 +203,7 @@ export const ProjectLists = ({ lists, projectId }: ProjectListsProps) => {
                         />
                       </div>
 
-                      <Droppable droppableId={`list-${list.id}`} type="TASK">
+                      <Droppable droppableId={list.id} type="TASK">
                         {(provided) => (
                           <div
                             className="space-y-2 flex-grow"
@@ -194,7 +251,7 @@ export const ProjectLists = ({ lists, projectId }: ProjectListsProps) => {
               ))
             ) : (
               <div className="col-span-full flex justify-center">
-                <CreateProjectListSheet projectId={projectId} />
+                You have no lists
               </div>
             )}
             {provided.placeholder}

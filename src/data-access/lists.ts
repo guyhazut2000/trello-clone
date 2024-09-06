@@ -41,9 +41,16 @@ export const deleteListWithTasks = async (id: string) => {
   ]);
 };
 
-export const updateListOrder = async (list: Omit<ListItem, "tasks">) => {
-  return await prisma.list.update({
-    where: { projectId: list.projectId, id: list.id },
-    data: list,
-  });
+export const updateListsOrder = async (
+  projectId: string,
+  lists: ListItem[]
+) => {
+  const updatePromises = lists.map((list) =>
+    prisma.list.update({
+      where: { id: list.id, projectId },
+      data: { position: list.position },
+    })
+  );
+
+  return await Promise.all(updatePromises);
 };

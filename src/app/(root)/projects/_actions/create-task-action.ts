@@ -20,32 +20,35 @@ export const createTaskAction = async (
     throw new Error("Invalid values");
   }
 
-  // Fetch the list by its ID
-  const list = await getListById(listId);
-  console.log(list);
+  try {
+    const list = await getListById(listId);
 
-  if (!list) {
-    throw new Error("List not found");
+    if (!list) {
+      throw new Error("List not found");
+    }
+
+    // Find the highest order among the tasks in the list
+    const lastTaskOrder = list.tasks.reduce(
+      (maxOrder, task) => Math.max(maxOrder, task.position),
+      0 // Start with 0 if there are no tasks
+    );
+
+    // Create the new task with the next order value
+    const newTask = await createTask({
+      ...validatedValues.data,
+      position: lastTaskOrder + 1,
+      listId,
+    });
+
+    revalidatePath(`/projects/${projectId}`);
+
+    return {
+      success: true,
+      data: newTask,
+    };
+  } catch (err) {
+    return {
+      error: "Failed to create task",
+    };
   }
-
-  // Find the highest order among the tasks in the list
-  const lastTaskOrder = list.tasks.reduce(
-    (maxOrder, task) => Math.max(maxOrder, task.position),
-    0 // Start with 0 if there are no tasks
-  );
-
-  // Create the new task with the next order value
-  const newTask = await createTask({
-    ...validatedValues.data,
-    position: lastTaskOrder + 1,
-    listId,
-  });
-
-  // Revalidate the path to update the project page
-  revalidatePath(`/projects/${projectId}`);
-
-  return {
-    success: true,
-    data: newTask,
-  };
 };

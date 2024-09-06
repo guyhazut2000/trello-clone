@@ -28,11 +28,11 @@ export const CreateTaskSheet = ({
 
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
-      <SheetTrigger>
-        <Button asChild variant={"outline"}>
+      <SheetTrigger asChild>
+        <Button variant={"outline"}>
           <div className="flex gap-x-2 items-center justify-start">
-            Create new Task
             <PlusIcon className="w-4 h-4" />
+            Create new Task
           </div>
         </Button>
       </SheetTrigger>

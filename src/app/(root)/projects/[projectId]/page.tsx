@@ -1,14 +1,27 @@
+"use server";
+
+import { auth } from "@clerk/nextjs/server";
 import { ListTodo } from "lucide-react";
+import { notFound, redirect } from "next/navigation";
+
 import { getProjectById } from "@/data-access/projects";
-import { getListsByProjectId } from "@/data-access/lists";
 import { Label } from "@/components/ui/label";
 
-import { CreateProjectListSheet } from "../_components/create-project-list-sheet";
 import { ProjectLists } from "../_components/project-lists";
+import { CreateProjectListSheet } from "../_components/create-project-list-sheet";
 
-const ProjectPage = async ({ params }: { params: { projectId: string } }) => {
+export default async function ProjectPage({
+  params,
+}: {
+  params: { projectId: string };
+}) {
+  const { userId } = auth();
+
+  if (!userId) redirect("/");
+
   const project = await getProjectById(params.projectId);
-  const lists = await getListsByProjectId(params.projectId);
+
+  if (!project) throw notFound();
 
   return (
     <div className="flex flex-col space-y-6 py-6 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,14 +43,18 @@ const ProjectPage = async ({ params }: { params: { projectId: string } }) => {
             <ListTodo className="w-5 h-5" />
             <span className="font-medium">Work Items</span>
           </div>
-          <CreateProjectListSheet projectId={params.projectId} type={"button"} />
+          <CreateProjectListSheet
+            projectId={params.projectId}
+            type={"button"}
+          />
         </div>
         <section className="mt-6">
-          <ProjectLists lists={lists} projectId={params.projectId} />
+          <ProjectLists
+            initialLists={project.lists}
+            projectId={params.projectId}
+          />
         </section>
       </div>
     </div>
   );
-};
-
-export default ProjectPage;
+}

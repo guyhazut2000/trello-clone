@@ -16,6 +16,8 @@ model Project {
   // Relations
   lists List[] // A project can have many lists (task lists)
 
+  userId      String  // Add this line to store Clerk user ID
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -28,7 +30,7 @@ model List {
   position Int 
 
   projectId String 
-  project   Project @relation(fields: [projectId], references: [id])
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   // Relations
   tasks Task[] // A list can have many tasks
@@ -46,7 +48,7 @@ model Task {
   position    Int // Position of the card within a list for ordering
 
   listId String // Foreign key to List
-  list   List   @relation(fields: [listId], references: [id])
+  list   List   @relation(fields: [listId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

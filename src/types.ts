@@ -4,7 +4,10 @@ import { Project, List, Task } from "@prisma/client";
 export type ProjectItem = Project & {
   lists: ListItem[];
 };
-export type CreateProjectBody = Pick<ProjectItem, "title" | "description">;
+export type CreateProjectBody = Pick<
+  ProjectItem,
+  "title" | "description" | "userId"
+>;
 
 // List
 export type ListItem = List & {

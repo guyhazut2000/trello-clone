@@ -1,41 +1,25 @@
 "use server";
 
-import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
-import { updateListOrder } from "@/data-access/lists";
-import { updateListOrderSchema } from "../validation";
+import { updateListsOrder } from "@/data-access/lists";
 import { ListItem } from "@/types";
 
 export const updateListOrderAction = async (
-  values: z.infer<typeof updateListOrderSchema>
+  projectId: string,
+  lists: ListItem[]
 ) => {
-  const validatedValues = updateListOrderSchema.safeParse(values);
+  try {
+    await updateListsOrder(projectId, lists);
 
-  if (!validatedValues.success) {
-    throw new Error("Invalid values");
+    revalidatePath(`/projects/${projectId}`);
+
+    return {
+      success: true,
+    };
+  } catch (err) {
+    return {
+      error: "Failed to update list order",
+    };
   }
-
-  const transaction = values.tasks.map(
-    async (list: Omit<ListItem, "tasks">) => {
-      const { projectId, ...result } = await updateListOrder({
-        projectId: values.projectId,
-        id: list.id,
-        title: list.title,
-        position: list.position,
-        createdAt: list.createdAt,
-        updatedAt: list.updatedAt,
-      });
-
-      return result;
-    }
-  );
-
-  await Promise.all(transaction);
-
-  revalidatePath(`/projects/${values.projectId}`);
-
-  return {
-    success: true,
-  };
 };

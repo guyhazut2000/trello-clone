@@ -2,6 +2,7 @@
 
 import { MoreVertical, Pin, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useTransition } from "react";
 
 import {
   Card,
@@ -10,19 +11,18 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { toast } from "sonner";
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { ProjectItem } from "@/types";
+import { Button } from "@/components/ui/button";
+import { Loader } from "@/components/loader";
 
 import { ProjectProgressBar } from "./project-progress-bar";
-import { Button } from "@/components/ui/button";
-import { useTransition } from "react";
-import { toast } from "sonner";
 import { TogglePinProjectAction } from "../projects/_actions/toggle-pin-project-action";
-import { Loader } from "@/components/loader";
 
 interface ProjectCardProps {
   project: ProjectItem;
@@ -37,7 +37,6 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
 
   const handleMoreClick = (event: React.MouseEvent) => {
     event.stopPropagation();
-    console.log("More options clicked");
   };
 
   return (
@@ -95,6 +94,7 @@ const CardOptions = ({ projectId, isPinned }: CardOptionsProps) => {
       <PopoverContent
         side="bottom"
         className="w-[200px] space-y-2 flex flex-col"
+        onOpenAutoFocus={(e) => e.preventDefault()} // disable auto focus when visible
       >
         <Button
           disabled={isPending}

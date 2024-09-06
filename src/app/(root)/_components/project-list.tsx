@@ -21,7 +21,7 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
 
   return (
     <div className="flex-1 mx-auto space-y-4">
-      <div className="flex items-center gap-x-2">
+      <div className="flex items-center gap-x-2 border p-2 rounded-lg bg-gray-50">
         <Pin className="h-4 w-4" />
         <h2>Pinned projects</h2>
       </div>
@@ -34,7 +34,7 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
           <ProjectCard key={p.id} project={p} />
         ))}
       </div>
-      <div className="flex items-center gap-x-2">
+      <div className="flex items-center gap-x-2 border p-2 rounded-lg bg-gray-50">
         <Layers className="h-4 w-4" />
         <h2>Other projects</h2>
       </div>

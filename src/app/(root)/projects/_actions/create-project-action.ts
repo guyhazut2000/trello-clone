@@ -1,28 +1,40 @@
 "use server";
 
 import { z } from "zod";
+import { auth } from "@clerk/nextjs/server";
+import { revalidatePath } from "next/cache";
 
-import { CreateProjectBody } from "@/types";
 import { createProject } from "@/data-access/projects";
 
-import { revalidatePath } from "next/cache";
 import { createProjectSchema } from "../validation";
 
 export const createProjectAction = async (
   values: z.infer<typeof createProjectSchema>
 ) => {
-  const validatedValues = createProjectSchema.safeParse(values);
+  const { userId } = auth();
 
-  if (!validatedValues.success) {
-    throw new Error("Invalid values");
+  if (!userId) throw new Error("Unauthorized");
+
+  try {
+    const validatedValues = createProjectSchema.safeParse(values);
+
+    if (!validatedValues.success) {
+      throw new Error("Invalid values");
+    }
+
+    const createProjectReturn = await createProject({
+      title: validatedValues.data.title,
+      description: validatedValues.data.description,
+      userId,
+    });
+
+    revalidatePath("/");
+
+    return {
+      success: true,
+      data: createProjectReturn,
+    };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
   }
-
-  const data: CreateProjectBody = validatedValues.data;
-  const createProjectReturn = await createProject(data);
-
-  revalidatePath("/");
-  return {
-    success: true,
-    data: createProjectReturn,
-  };
 };

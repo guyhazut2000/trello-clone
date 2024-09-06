@@ -14,7 +14,7 @@ export const createTaskSchema = z.object({
 });
 
 export const updateListOrderSchema = z.object({
-  tasks: z.array(
+  lists: z.array(
     z.object({
       id: z.string(),
       title: z.string(),
