@@ -1,6 +1,8 @@
 "use server";
 
 import { User2Icon } from "lucide-react";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 import { getProjects } from "@/data-access/projects";
 
@@ -9,9 +11,15 @@ import { CreateProjectForm } from "../_components/forms/create-project-form";
 import { ProjectList } from "../_components/project-list";
 
 export default async function ProjectsPage() {
+  const { userId } = auth();
+
+  if (!userId) redirect("/");
+
   const projects = await getProjects({
     sort: "updatedAt",
   });
+
+  console.log("Rendered projects");
 
   return (
     <div className="space-y-8 w-full py-4">

@@ -40,6 +40,7 @@ export const createTaskAction = async (
       listId,
     });
 
+    revalidatePath("/");
     revalidatePath(`/projects/${projectId}`);
 
     return {

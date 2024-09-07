@@ -11,14 +11,14 @@ import { useState } from "react";
 
 import { ListItem } from "@/types";
 import { toast } from "sonner";
-import { sortListByPosition, sortTasksByPosition } from "@/lib/utils";
+import { cn, sortListByPosition, sortTasksByPosition } from "@/lib/utils";
 
 import { CreateTaskSheet } from "./create-task-sheet";
 import { DeleteListButton } from "./delete-list-button";
 import { updateListOrderAction } from "../_actions/update-list-order-action";
 import { updateTaskOrderAction } from "../_actions/update-task-order-action";
-import { deleteTaskAction } from "../_actions/delete-task-action";
-import { createTaskAction } from "../_actions/create-task-action";
+
+export const dynamicParams = true; // Enable handling of dynamic parameters
 
 interface ProjectListsProps {
   initialLists: ListItem[];
@@ -36,43 +36,37 @@ export const ProjectLists = ({
 
     if (!destination) return;
 
-    // If dropped in the same position
     if (
       destination.droppableId === source.droppableId &&
       destination.index === source.index
     )
       return;
 
-    // Prepare for optimistic updates
-    let updatedLists = [...lists];
+    const previousLists = [...lists]; // Capture the previous state
 
     if (type === "LIST") {
       const reorderedList = reorder(
-        updatedLists,
+        previousLists,
         source.index,
         destination.index
       ).map((item, index) => ({ ...item, position: index }));
 
-      // Optimistically update the UI
       setLists(reorderedList);
 
-      // Dispatch server action to update list position
       try {
         const { error, success } = await updateListOrderAction(
           projectId,
           reorderedList
         );
 
-        if (success) {
-          toast.success("List updated successfully");
-        } else {
-          toast.error(error || "Failed to update list");
-          setLists(lists);
+        if (!success) {
+          throw new Error(error || "Failed to update list");
         }
+
+        toast.success("List updated successfully");
       } catch (err) {
         toast.error("Failed to update list");
-        // Rollback the optimistic update if needed
-        setLists(lists);
+        setLists(previousLists); // Rollback to previous state
       }
     }
 
@@ -82,19 +76,10 @@ export const ProjectLists = ({
         (l) => l.id === destination.droppableId
       );
 
-      if (!sourceList || !destinationList) {
-        return;
-      }
+      if (!sourceList || !destinationList) return;
 
-      if (!sourceList.tasks) {
-        sourceList.tasks = [];
-      }
+      const previousLists = [...lists]; // Capture the previous state
 
-      if (!destinationList.tasks) {
-        destinationList.tasks = [];
-      }
-
-      // Reorder the task in the same list
       if (source.droppableId === destination.droppableId) {
         const reorderedTasks = reorder(
           sourceList.tasks,
@@ -107,47 +92,41 @@ export const ProjectLists = ({
 
         sourceList.tasks = reorderedTasks;
 
-        const listId = destination.droppableId;
+        setLists([...previousLists]);
 
-        const { error, success } = await updateTaskOrderAction(
-          projectId,
-          listId,
-          reorderedTasks
-        );
+        try {
+          const { error, success } = await updateTaskOrderAction(
+            projectId,
+            destination.droppableId,
+            reorderedTasks
+          );
 
-        if (success) {
+          if (!success) {
+            throw new Error(error || "Failed to update task position");
+          }
+
           toast.success("Task position updated successfully");
-        } else {
-          toast.error(error || "Failed to update task position");
-          setLists(lists);
+        } catch (err) {
+          toast.error("Failed to update task position");
+          setLists(previousLists); // Rollback to previous state
         }
-
-        // User move the task to another list
       } else {
         const [movedTask] = sourceList.tasks.splice(source.index, 1);
-
-        // Update the task's listId to the destination
         movedTask.listId = destination.droppableId;
-
-        // Add the task to the destination list
         destinationList.tasks.splice(destination.index, 0, movedTask);
 
-        // Update positions in the source list
         sourceList.tasks.forEach((task, index) => {
           task.position = index;
         });
 
-        // Update positions in the destination list
         destinationList.tasks.forEach((task, index) => {
           task.position = index;
         });
 
-        // Optimistically update the UI
-        setLists([...updatedLists]);
+        setLists([...previousLists]);
 
-        // Dispatch the server action to update both lists
         try {
-          await Promise.all([
+          const results = await Promise.allSettled([
             updateTaskOrderAction(projectId, sourceList.id, sourceList.tasks),
             updateTaskOrderAction(
               projectId,
@@ -156,11 +135,36 @@ export const ProjectLists = ({
             ),
           ]);
 
-          toast.success("Task moved successfully!");
-        } catch (error) {
-          // If something goes wrong, rollback the changes
-          toast.error("Failed to move the task.");
-          setLists(lists); // Rollback to the previous state
+          const errors = results
+            .filter(
+              (result) =>
+                result.status === "rejected" ||
+                (result.status === "fulfilled" && result.value?.error)
+            )
+            .map((result) => {
+              if (result.status === "rejected") {
+                return (
+                  (result as PromiseRejectedResult).reason.message ||
+                  "Unknown error"
+                );
+              }
+              if (result.status === "fulfilled" && result.value.error) {
+                return result.value.error;
+              }
+            });
+
+          if (errors.length > 0) {
+            // If any of the promises failed, display an error message
+            toast.error(`Failed to move the task. Error: ${errors.join(", ")}`);
+            setLists(previousLists); // Rollback to previous state
+          } else {
+            // If all promises were successful
+            toast.success("Task moved successfully!");
+          }
+        } catch (err) {
+          // Handle any unexpected errors (unlikely with Promise.allSettled)
+          toast.error("An unexpected error occurred while moving the task.");
+          setLists(previousLists); // Rollback to previous state
         }
       }
     }
@@ -179,16 +183,21 @@ export const ProjectLists = ({
       <Droppable droppableId="project-lists" direction="horizontal" type="LIST">
         {(provided) => (
           <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
-            {lists.length > 0 ? (
-              lists.sort(sortListByPosition).map((list, index) => (
+            {initialLists.length > 0 ? (
+              initialLists.sort(sortListByPosition).map((list, index) => (
                 <Draggable key={list.id} draggableId={list.id} index={index}>
-                  {(provided) => (
+                  {(provided, snapshot) => (
                     <div
-                      className="bg-gray-50 rounded-lg shadow-md flex flex-col gap-3 p-4 transition-all duration-300 ease-in-out hover:shadow-lg"
+                      className={cn(
+                        "rounded-lg shadow-md flex flex-col gap-3 p-4 transition-all duration-300 ease-in-out hover:shadow-lg",
+                        snapshot.isDragging
+                          ? "bg-gray-200 scale-105 shadow-lg"
+                          : "bg-gray-50"
+                      )}
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
@@ -219,12 +228,17 @@ export const ProjectLists = ({
                                     draggableId={`task-${task.id}`}
                                     index={taskIndex}
                                   >
-                                    {(provided) => (
+                                    {(provided, snapshot) => (
                                       <div
                                         ref={provided.innerRef}
                                         {...provided.draggableProps}
                                         {...provided.dragHandleProps}
-                                        className="bg-white p-3 rounded shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between group"
+                                        className={cn(
+                                          "bg-white p-3 rounded shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between group",
+                                          snapshot.isDragging
+                                            ? "bg-blue-200 scale-105 shadow-lg"
+                                            : "bg-white"
+                                        )}
                                       >
                                         <span className="truncate">
                                           {task.title}
