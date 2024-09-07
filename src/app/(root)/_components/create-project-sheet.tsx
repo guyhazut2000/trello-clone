@@ -7,7 +7,14 @@ import { useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import {
   Form,
   FormControl,
@@ -20,10 +27,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/submit-button";
 
-import { createProjectSchema } from "../../projects/validation";
-import { createProjectAction } from "../../projects/_actions/create-project-action";
+import { createProjectSchema } from "../projects/validation";
+import { createProjectAction } from "../projects/_actions/create-project-action";
 
-export const CreateProjectForm = () => {
+export const CreateProjectSheet = () => {
   const [showSheet, setShowSheet] = useState(false);
 
   return (
@@ -34,18 +41,22 @@ export const CreateProjectForm = () => {
           Create Project
         </Button>
       </SheetTrigger>
-      <SheetContent>
-        <CreateProject setShowSheet={setShowSheet} />
+      <SheetContent className="gap-4 flex flex-col">
+        <SheetHeader>
+          <SheetTitle>Create Project</SheetTitle>
+          <SheetDescription>Create your project here. </SheetDescription>
+        </SheetHeader>
+        <CreateProjectForm setShowSheet={setShowSheet} />
       </SheetContent>
     </Sheet>
   );
 };
 
-interface CreateProjectProps {
+interface CreateProjectFormProps {
   setShowSheet: (show: boolean) => void;
 }
 
-const CreateProject = ({ setShowSheet }: CreateProjectProps) => {
+const CreateProjectForm = ({ setShowSheet }: CreateProjectFormProps) => {
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof createProjectSchema>>({
@@ -82,7 +93,7 @@ const CreateProject = ({ setShowSheet }: CreateProjectProps) => {
             <FormItem>
               <FormLabel>Project Title</FormLabel>
               <FormControl>
-                <Input placeholder="project name" {...field} />
+                <Input placeholder="Enter project title..." {...field} />
               </FormControl>
               <FormDescription>
                 This is your project display name.
@@ -96,9 +107,12 @@ const CreateProject = ({ setShowSheet }: CreateProjectProps) => {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Project Title</FormLabel>
+              <FormLabel>Project Description</FormLabel>
               <FormControl>
-                <Input placeholder="project name" {...field} />
+                <Input
+                  placeholder="Enter a brief description of the project..."
+                  {...field}
+                />
               </FormControl>
               <FormDescription>
                 This is your project display name.

@@ -1,7 +1,8 @@
 "use server";
 
-import { getProjectById, updateProjectById } from "@/data-access/projects";
 import { revalidatePath } from "next/cache";
+
+import { getProjectById, updateProjectById } from "@/data-access/projects";
 
 export const TogglePinProjectAction = async (projectId: string) => {
   try {
@@ -10,7 +11,6 @@ export const TogglePinProjectAction = async (projectId: string) => {
     if (!project) throw new Error(`Project ${projectId} not found`);
 
     await updateProjectById(projectId, {
-      ...project,
       isPinned: !project.isPinned,
     });
 

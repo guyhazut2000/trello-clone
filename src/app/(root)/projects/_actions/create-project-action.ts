@@ -7,6 +7,7 @@ import { revalidatePath } from "next/cache";
 import { createProject } from "@/data-access/projects";
 
 import { createProjectSchema } from "../validation";
+import { createProjectListAction } from "./create-list-action";
 
 export const createProjectAction = async (
   values: z.infer<typeof createProjectSchema>
@@ -27,6 +28,19 @@ export const createProjectAction = async (
       description: validatedValues.data.description,
       userId,
     });
+
+    const defaultProjectListsTitles = [
+      "Backlog",
+      "To Do",
+      "In Progress",
+      "Completed",
+    ];
+
+    await Promise.all(
+      defaultProjectListsTitles.map((title) =>
+        createProjectListAction(createProjectReturn.id, { title })
+      )
+    );
 
     revalidatePath("/");
 

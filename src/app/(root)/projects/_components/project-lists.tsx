@@ -14,7 +14,6 @@ import { toast } from "sonner";
 import { cn, sortListByPosition, sortTasksByPosition } from "@/lib/utils";
 
 import { CreateTaskSheet } from "./create-task-sheet";
-import { DeleteListButton } from "./delete-list-button";
 import { updateListOrderAction } from "../_actions/update-list-order-action";
 import { updateTaskOrderAction } from "../_actions/update-task-order-action";
 
@@ -29,6 +28,7 @@ export const ProjectLists = ({
   initialLists,
   projectId,
 }: ProjectListsProps) => {
+  initialLists.forEach((prop) => console.log(prop));
   const [lists, setLists] = useState(initialLists);
 
   const handleDragEnd = async (result: DropResult) => {
@@ -183,7 +183,7 @@ export const ProjectLists = ({
       <Droppable droppableId="project-lists" direction="horizontal" type="LIST">
         {(provided) => (
           <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
             ref={provided.innerRef}
             {...provided.droppableProps}
           >
@@ -206,10 +206,7 @@ export const ProjectLists = ({
                         <h3 className="font-semibold text-lg text-gray-800">
                           {list.title}
                         </h3>
-                        <DeleteListButton
-                          listId={list.id}
-                          projectId={projectId}
-                        />
+                        <span className="select-none">{list.tasks.length}</span>
                       </div>
 
                       <Droppable droppableId={list.id} type="TASK">

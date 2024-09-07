@@ -6,7 +6,6 @@ import { deleteListWithTasks } from "@/data-access/lists";
 
 export const deleteListAction = async (projectId: string, listId: string) => {
   try {
-    console.log(projectId);
     await deleteListWithTasks(listId);
 
     revalidatePath(`/projects/${projectId}`);

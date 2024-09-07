@@ -8,7 +8,24 @@ import { getProjectById } from "@/data-access/projects";
 import { Label } from "@/components/ui/label";
 
 import { ProjectLists } from "../_components/project-lists";
-import { CreateProjectListSheet } from "../_components/create-project-list-sheet";
+import { Metadata, ResolvingMetadata } from "next";
+import { shortenString } from "@/lib/utils";
+
+type Props = {
+  params: { projectId: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export async function generateMetadata(
+  { params, searchParams }: Props,
+  parent: ResolvingMetadata
+): Promise<Metadata> {
+  const project = await getProjectById(params.projectId);
+
+  return {
+    title: shortenString(project?.title, 20) || "Project",
+  };
+}
 
 export default async function ProjectPage({
   params,
@@ -43,10 +60,6 @@ export default async function ProjectPage({
             <ListTodo className="w-5 h-5" />
             <span className="font-medium">Work Items</span>
           </div>
-          <CreateProjectListSheet
-            projectId={params.projectId}
-            type={"button"}
-          />
         </div>
         <section className="mt-6">
           <ProjectLists

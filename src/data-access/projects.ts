@@ -32,6 +32,7 @@ export const getProjectById = async (projectId: string) => {
 export const createProject = async (project: CreateProjectBody) => {
   return await prisma.project.create({
     data: project,
+    include: { lists: true },
   });
 };
 
