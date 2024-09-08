@@ -36,6 +36,12 @@ export const createProject = async (project: CreateProjectBody) => {
   });
 };
 
+export const deleteProject = async (projectId: string) => {
+  return await prisma.project.delete({
+    where: { id: projectId },
+  });
+};
+
 export const updateProjectById = async (
   projectId: string,
   projectData: Partial<Omit<ProjectItem, "lists">>

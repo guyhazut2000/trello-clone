@@ -2,7 +2,7 @@
 
 import { MoreVertical, Pin, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 
 import {
   Card,
@@ -23,12 +23,20 @@ import { Loader } from "@/components/loader";
 
 import { ProjectProgressBar } from "./project-progress-bar";
 import { TogglePinProjectAction } from "../projects/_actions/toggle-pin-project-action";
+import { deleteProjectAction } from "../projects/_actions/delete-project-action";
+import DeleteProjectAlert from "./delete-project-alert";
 
 interface ProjectCardProps {
   project: ProjectItem;
+  totalTasks: number;
+  completedTasks: number;
 }
 
-export const ProjectCard = ({ project }: ProjectCardProps) => {
+export const ProjectCard = ({
+  project,
+  totalTasks,
+  completedTasks,
+}: ProjectCardProps) => {
   const router = useRouter();
 
   const handleProjectCardClick = () => {
@@ -56,8 +64,8 @@ export const ProjectCard = ({ project }: ProjectCardProps) => {
       </CardHeader>
       <CardContent>
         <ProjectProgressBar
-          completedTask={7}
-          totalTasks={11}
+          completedTasks={completedTasks}
+          totalTasks={totalTasks}
           lastUpdate={project.updatedAt}
         />
       </CardContent>
@@ -71,11 +79,15 @@ interface CardOptionsProps {
 }
 
 const CardOptions = ({ projectId, isPinned }: CardOptionsProps) => {
-  const [isPending, startTransition] = useTransition();
+  const [isPinTogglePending, startPinToggleTransition] = useTransition();
+  const [isDeleteProjectPending, startDeleteProjectTransition] =
+    useTransition();
+
+  const [showPopover, setShowPopover] = useState(false);
 
   const handleMarkProjectAsPinned = async () => {
     try {
-      startTransition(async () => {
+      startPinToggleTransition(async () => {
         const { success, error } = await TogglePinProjectAction(projectId);
         if (success) {
           toast.success("Project pinned successfully!");
@@ -83,11 +95,28 @@ const CardOptions = ({ projectId, isPinned }: CardOptionsProps) => {
           toast.error(error || "Failed to pin project");
         }
       });
-    } catch (error) {}
+    } catch (error) {
+      toast.error((error as Error).message || "Failed to delete project");
+    }
+  };
+
+  const handleDeleteProject = async () => {
+    try {
+      startDeleteProjectTransition(async () => {
+        const { success, error } = await deleteProjectAction(projectId);
+        if (success) {
+          toast.success("Project Deleted successfully!");
+        } else {
+          toast.error(error || "Failed to delete project");
+        }
+      });
+    } catch (error) {
+      toast.error((error as Error).message || "Failed to delete project");
+    }
   };
 
   return (
-    <Popover>
+    <Popover open={showPopover} onOpenChange={setShowPopover}>
       <PopoverTrigger asChild>
         <MoreVertical className="h-4 w-4" />
       </PopoverTrigger>
@@ -97,27 +126,33 @@ const CardOptions = ({ projectId, isPinned }: CardOptionsProps) => {
         onOpenAutoFocus={(e) => e.preventDefault()} // disable auto focus when visible
       >
         <Button
-          disabled={isPending}
+          disabled={isPinTogglePending}
           onClick={handleMarkProjectAsPinned}
           className="flex gap-x-2 items-center justify-start p-1"
-          variant="popover"
+          variant="ghost"
         >
-          {isPending ? (
+          {isPinTogglePending ? (
             <Loader />
           ) : (
             <>
               <Pin className="h-4 w-4" />
-              <span>{isPinned ? "Un Pin" : "Pin"}</span>
+              <span>{isPinned ? "Unpin" : "Pin"}</span>
             </>
           )}
         </Button>
         <Button
-          disabled={isPending}
-          variant="popover"
+          disabled={isDeleteProjectPending}
+          variant="ghost"
           className="flex gap-x-2 items-center justify-start text-red-500 hover:text-red-500 p-1"
         >
-          <Trash2 className="h-4 w-4" />
-          <p>Delete project</p>
+          {isDeleteProjectPending ? (
+            <Loader />
+          ) : (
+            <DeleteProjectAlert
+              onDelete={handleDeleteProject}
+              setShowPopover={setShowPopover}
+            />
+          )}
         </Button>
       </PopoverContent>
     </Popover>

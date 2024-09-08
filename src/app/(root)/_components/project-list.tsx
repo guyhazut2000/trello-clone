@@ -6,7 +6,6 @@ import { Layers, Pin } from "lucide-react";
 import { ProjectItem } from "@/types";
 
 import { ProjectCard } from "./project-card";
-import { CreateProjectSheet } from "./create-project-sheet";
 
 interface ProjectListProps {
   projects: ProjectItem[];
@@ -20,6 +19,19 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
     isPinnedPredicate
   );
 
+  function calculateProjectProgress(project: ProjectItem) {
+    const totalTasks = project.lists.reduce(
+      (acc, list) => acc + list.tasks.length,
+      0
+    );
+    const completedTasks = project.lists.reduce(
+      (acc, list) =>
+        acc + list.tasks.filter((task) => task.status === "COMPLETED").length,
+      0
+    );
+    return { totalTasks, completedTasks };
+  }
+
   return (
     <div className="flex-1 mx-auto space-y-4">
       {pinnedProjects.length > 0 && (
@@ -30,9 +42,18 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {pinnedProjects?.map((p) => (
-              <ProjectCard key={p.id} project={p} />
-            ))}
+            {pinnedProjects?.map((p) => {
+              const progressBar = calculateProjectProgress(p);
+
+              return (
+                <ProjectCard
+                  key={p.id}
+                  project={p}
+                  totalTasks={progressBar.totalTasks}
+                  completedTasks={progressBar.completedTasks}
+                />
+              );
+            })}
           </div>
         </>
       )}
@@ -44,9 +65,18 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            {otherProjects?.map((p) => (
-              <ProjectCard key={p.id} project={p} />
-            ))}
+            {otherProjects?.map((p) => {
+              const progressBar = calculateProjectProgress(p);
+
+              return (
+                <ProjectCard
+                  key={p.id}
+                  project={p}
+                  totalTasks={progressBar.totalTasks}
+                  completedTasks={progressBar.completedTasks}
+                />
+              );
+            })}
           </div>
         </>
       )}

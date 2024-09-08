@@ -26,7 +26,7 @@ const SidebarItem = ({ route }: SidebarItemProps) => {
   return (
     <Link
       href={route.path}
-      className="flex items-center space-x-2 w-full hover:bg-gray-100 rounded-lg px-2 py-1 cursor-pointer"
+      className="flex items-center space-x-2 w-full hover:bg-gray-100 rounded-lg px-2 py-1 cursor-pointer select-none"
     >
       <Icon className="h-5 w-5" />
       <span>{route.name}</span>
