@@ -1,4 +1,14 @@
 import { Project, List, Task } from "@prisma/client";
+import {
+  TaskPriority as PrismaTaskPriority,
+  TaskStatus as PrismaTaskStatus,
+  TaskType as PrismaTaskType,
+} from "@prisma/client";
+
+// Task Types
+export const TaskType = PrismaTaskType;
+export const TaskPriority = PrismaTaskPriority;
+export const TaskStatus = PrismaTaskStatus;
 
 // Project
 export type ProjectItem = Project & {
@@ -18,4 +28,4 @@ export type UpdateListOrder = ListItem[];
 
 // Tasks
 export type TaskItem = Task;
-export type CreateTaskBody = Pick<TaskItem, "title" | "position" | "listId">;
+export type CreateTaskBody = Omit<TaskItem, "id" | "createdAt" | "updatedAt">;

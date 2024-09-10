@@ -7,13 +7,14 @@ import { getListById } from "@/data-access/lists";
 
 import { createTaskSchema } from "../validation";
 import { createTask } from "@/data-access/tasks";
+import { getProjectById } from "@/data-access/projects";
+import { TaskStatus } from "@/types";
+import { statusToListMap } from "@/lib/utils";
 
 export const createTaskAction = async (
   projectId: string,
-  listId: string,
   values: z.infer<typeof createTaskSchema>
 ) => {
-  // Validate input values using Zod
   const validatedValues = createTaskSchema.safeParse(values);
 
   if (!validatedValues.success) {
@@ -21,10 +22,20 @@ export const createTaskAction = async (
   }
 
   try {
-    const list = await getListById(listId);
+    const project = await getProjectById(projectId);
+
+    if (!project) {
+      throw new Error("Project not found");
+    }
+
+    const list = project.lists.find(
+      (l) => l.title === statusToListMap[values.status]
+    );
+
+    console.log("List:", list);
 
     if (!list) {
-      throw new Error("List not found");
+      throw new Error("Matching list not found");
     }
 
     // Find the highest order among the tasks in the list
@@ -33,11 +44,16 @@ export const createTaskAction = async (
       0 // Start with 0 if there are no tasks
     );
 
+    console.log({
+      ...validatedValues.data,
+      position: lastTaskOrder + 1,
+      listId: list.id,
+    });
     // Create the new task with the next order value
     const newTask = await createTask({
       ...validatedValues.data,
       position: lastTaskOrder + 1,
-      listId,
+      listId: list.id,
     });
 
     revalidatePath(`/projects/${projectId}`);

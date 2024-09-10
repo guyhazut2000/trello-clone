@@ -13,7 +13,6 @@ import { ListItem } from "@/types";
 import { toast } from "sonner";
 import { cn, sortListByPosition, sortTasksByPosition } from "@/lib/utils";
 
-import { CreateTaskSheet } from "./create-task-sheet";
 import { updateListOrderAction } from "../_actions/update-list-order-action";
 import { updateTaskOrderAction } from "../_actions/update-task-order-action";
 
@@ -254,8 +253,6 @@ export const ProjectLists = ({
                           </div>
                         )}
                       </Droppable>
-
-                      <CreateTaskSheet listId={list.id} projectId={projectId} />
                     </div>
                   )}
                 </Draggable>

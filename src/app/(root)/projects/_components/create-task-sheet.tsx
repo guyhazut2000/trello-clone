@@ -16,14 +16,10 @@ import {
 import { CreateTaskForm } from "./create-task-form";
 
 interface CreateTaskSheetProps {
-  listId: string;
   projectId: string;
 }
 
-export const CreateTaskSheet = ({
-  listId,
-  projectId,
-}: CreateTaskSheetProps) => {
+export const CreateTaskSheet = ({ projectId }: CreateTaskSheetProps) => {
   const [sheetOpen, setSheetOpen] = useState(false);
 
   return (
@@ -36,19 +32,15 @@ export const CreateTaskSheet = ({
           </div>
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent className="w-screen md:w-full">
         <SheetHeader>
           <SheetTitle>Create Task</SheetTitle>
-
           <SheetDescription>
             Add a new task to the current board.
           </SheetDescription>
         </SheetHeader>
-        <CreateTaskForm
-          listId={listId}
-          projectId={projectId}
-          setSheetOpen={setSheetOpen}
-        />
+
+        <CreateTaskForm projectId={projectId} setSheetOpen={setSheetOpen} />
       </SheetContent>
     </Sheet>
   );

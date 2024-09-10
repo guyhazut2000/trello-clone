@@ -5,11 +5,12 @@ import { ListTodo } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 
 import { getProjectById } from "@/data-access/projects";
+import { Metadata, ResolvingMetadata } from "next";
 import { Label } from "@/components/ui/label";
 
 import { ProjectLists } from "../_components/project-lists";
-import { Metadata, ResolvingMetadata } from "next";
 import { shortenString } from "@/lib/utils";
+import { CreateTaskSheet } from "../_components/create-task-sheet";
 
 type Props = {
   params: { projectId: string };
@@ -41,7 +42,7 @@ export default async function ProjectPage({
   if (!project) throw notFound();
 
   return (
-    <div className="flex flex-col space-y-6 py-6 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex flex-col space-y-6 py-6 w-full px-4 sm:px-6 lg:px-8">
       <div className="flex flex-row justify-between items-center w-full">
         <h2 className="font-bold text-3xl text-gray-800 transition-all duration-300 ease-in-out hover:text-gray-600">
           {project?.title}
@@ -60,6 +61,7 @@ export default async function ProjectPage({
             <ListTodo className="w-5 h-5" />
             <span className="font-medium">Work Items</span>
           </div>
+          <CreateTaskSheet projectId={params.projectId} />
         </div>
         <section className="mt-6">
           <ProjectLists

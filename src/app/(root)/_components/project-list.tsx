@@ -4,6 +4,7 @@ import { partition } from "lodash";
 import { Layers, Pin } from "lucide-react";
 
 import { ProjectItem } from "@/types";
+import { calculateProjectProgress } from "@/lib/utils";
 
 import { ProjectCard } from "./project-card";
 
@@ -19,19 +20,7 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
     isPinnedPredicate
   );
 
-  function calculateProjectProgress(project: ProjectItem) {
-    const totalTasks = project.lists.reduce(
-      (acc, list) => acc + list.tasks.length,
-      0
-    );
-    const completedTasks = project.lists.reduce(
-      (acc, list) =>
-        acc + list.tasks.filter((task) => task.status === "COMPLETED").length,
-      0
-    );
-    return { totalTasks, completedTasks };
-  }
-
+  console.log(projects[0].lists);
   return (
     <div className="flex-1 mx-auto space-y-4">
       {pinnedProjects.length > 0 && (

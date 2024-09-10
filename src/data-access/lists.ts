@@ -1,3 +1,4 @@
+import { TaskStatus } from "@prisma/client";
 import prisma from "@/lib/db";
 import { CreateListBody, ListItem } from "@/types";
 
@@ -15,6 +16,18 @@ export const getListsByProjectId = async (projectId: string) => {
 export const getListById = async (id: string) => {
   return await prisma.list.findUnique({
     where: { id },
+    include: {
+      tasks: true,
+    },
+  });
+};
+
+export const getListByStatus = async (
+  projectId: string,
+  status: TaskStatus
+) => {
+  return await prisma.list.findUnique({
+    where: { id: projectId },
     include: {
       tasks: true,
     },

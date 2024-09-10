@@ -4,6 +4,9 @@ import { revalidatePath } from "next/cache";
 
 import { TaskItem } from "@/types";
 import { updateTasksOrder } from "@/data-access/tasks";
+import { getListById } from "@/data-access/lists";
+import { listToStatusMap } from "@/lib/utils";
+import { TaskStatus } from "@prisma/client";
 
 export const updateTaskOrderAction = async (
   projectId: string,
@@ -11,6 +14,21 @@ export const updateTaskOrderAction = async (
   tasks: TaskItem[]
 ) => {
   try {
+    console.log("List ID: ", listId);
+    console.log("Tasks: ", tasks);
+
+    const list = await getListById(listId);
+
+    const newTaskStatus =
+      listToStatusMap[list?.title as keyof typeof listToStatusMap];
+
+    if (!newTaskStatus) {
+      throw new Error("Unable to determine task status based on list title.");
+    }
+
+    tasks.forEach((task) => {
+      task.status = newTaskStatus;
+    });
     await updateTasksOrder(listId, tasks);
 
     revalidatePath(`/projects/${projectId}`);
