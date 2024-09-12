@@ -48,6 +48,21 @@ export function calculateProjectProgress(project: ProjectItem) {
   return { totalTasks, completedTasks };
 }
 
+export function getStatusFromListTitle(title: string) {
+  switch (title.toLowerCase()) {
+    case "backlog":
+      return TaskStatus.BACKLOG;
+    case "to do":
+      return TaskStatus.TODO;
+    case "in progress":
+      return TaskStatus.IN_PROGRESS;
+    case "completed":
+      return TaskStatus.COMPLETED;
+    default:
+      throw new Error(`Unknown list title: ${title}`);
+  }
+}
+
 export const statusToListMap = {
   [TaskStatus.TODO]: "To Do",
   [TaskStatus.IN_PROGRESS]: "In Progress",

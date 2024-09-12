@@ -32,8 +32,6 @@ export const createTaskAction = async (
       (l) => l.title === statusToListMap[values.status]
     );
 
-    console.log("List:", list);
-
     if (!list) {
       throw new Error("Matching list not found");
     }
@@ -44,15 +42,10 @@ export const createTaskAction = async (
       0 // Start with 0 if there are no tasks
     );
 
-    console.log({
-      ...validatedValues.data,
-      position: lastTaskOrder + 1,
-      listId: list.id,
-    });
     // Create the new task with the next order value
     const newTask = await createTask({
       ...validatedValues.data,
-      position: lastTaskOrder + 1,
+      position: list.tasks.length === 0 ? 0 : lastTaskOrder + 1,
       listId: list.id,
     });
 

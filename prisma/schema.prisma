@@ -68,7 +68,7 @@ model Task {
   listId String // Foreign key to List
   list   List   @relation(fields: [listId], references: [id], onDelete: Cascade)
 
-  position    Int 
+  position    Int @default(0)
   deadline DateTime 
 
   status TaskStatus @default(TODO)

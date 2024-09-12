@@ -2,7 +2,7 @@ import React, { ReactNode } from "react";
 
 import { Navbar } from "@/components/navbar";
 import { Sidebar } from "@/components/sidebar";
-import { PagesWrapper } from "@/components/pages-wrapper";
+import { PageWrapper } from "@/components/page-wrapper";
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -13,7 +13,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Sidebar />
         </div>
         <div className="flex-1">
-          <PagesWrapper>{children}</PagesWrapper>
+          <PageWrapper>{children}</PageWrapper>
         </div>
       </div>
     </main>

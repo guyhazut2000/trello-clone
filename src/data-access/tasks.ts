@@ -25,3 +25,10 @@ export const updateTasksOrder = async (listId: string, tasks: TaskItem[]) => {
 
   return await Promise.all(updatePromises);
 };
+
+export const updateTask = async (taskId: string, task: Partial<TaskItem>) => {
+  return await prisma.task.update({
+    where: { id: taskId },
+    data: task,
+  });
+};

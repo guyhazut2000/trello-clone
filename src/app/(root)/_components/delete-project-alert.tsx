@@ -24,7 +24,10 @@ export default function DeleteProjectAlert({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button className="flex gap-x-2">
+        <Button
+          className="flex gap-x-2 w-full hover:opacity-80 justify-start"
+          variant={"destructive"}
+        >
           <Trash2 className="h-4 w-4" />
           Delete project
         </Button>

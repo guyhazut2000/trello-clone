@@ -7,16 +7,21 @@ import {
   DragDropContext,
   DropResult,
 } from "@hello-pangea/dnd";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import { ListItem } from "@/types";
 import { toast } from "sonner";
-import { cn, sortListByPosition, sortTasksByPosition } from "@/lib/utils";
+import {
+  cn,
+  getStatusFromListTitle,
+  sortListByPosition,
+  sortTasksByPosition,
+} from "@/lib/utils";
 
 import { updateListOrderAction } from "../_actions/update-list-order-action";
 import { updateTaskOrderAction } from "../_actions/update-task-order-action";
-
-export const dynamicParams = true; // Enable handling of dynamic parameters
+import { updateTaskAction } from "../../tasks/_actions/update-task-action";
+import { cloneDeep } from "lodash";
 
 interface ProjectListsProps {
   initialLists: ListItem[];
@@ -27,154 +32,176 @@ export const ProjectLists = ({
   initialLists,
   projectId,
 }: ProjectListsProps) => {
-  initialLists.forEach((prop) => console.log(prop));
   const [lists, setLists] = useState(initialLists);
 
-  const handleDragEnd = async (result: DropResult) => {
-    const { destination, source, type } = result;
+  const reorder = useCallback(
+    (list: any[], startIndex: number, endIndex: number) => {
+      const result = [...list];
+      const [removed] = result.splice(startIndex, 1);
+      result.splice(endIndex, 0, removed);
+      return result;
+    },
+    []
+  );
 
-    if (!destination) return;
+  const handleListDrag = async (
+    sourceIndex: number,
+    destinationIndex: number,
+    previousLists: ListItem[]
+  ) => {
+    const reorderedList = reorder(
+      previousLists,
+      sourceIndex,
+      destinationIndex
+    ).map((item, index) => ({ ...item, position: index }));
 
-    if (
-      destination.droppableId === source.droppableId &&
-      destination.index === source.index
-    )
-      return;
+    setLists(reorderedList);
 
-    const previousLists = [...lists]; // Capture the previous state
-
-    if (type === "LIST") {
-      const reorderedList = reorder(
-        previousLists,
-        source.index,
-        destination.index
-      ).map((item, index) => ({ ...item, position: index }));
-
-      setLists(reorderedList);
-
-      try {
-        const { error, success } = await updateListOrderAction(
-          projectId,
-          reorderedList
-        );
-
-        if (!success) {
-          throw new Error(error || "Failed to update list");
-        }
-
-        toast.success("List updated successfully");
-      } catch (err) {
-        toast.error("Failed to update list");
-        setLists(previousLists); // Rollback to previous state
-      }
-    }
-
-    if (type === "TASK") {
-      const sourceList = lists.find((l) => l.id === source.droppableId);
-      const destinationList = lists.find(
-        (l) => l.id === destination.droppableId
+    try {
+      const { error, success } = await updateListOrderAction(
+        projectId,
+        reorderedList
       );
 
-      if (!sourceList || !destinationList) return;
+      if (!success) throw new Error(error || "Failed to update list");
 
-      const previousLists = [...lists]; // Capture the previous state
+      toast.success("List updated successfully");
+    } catch (err) {
+      toast.error("Failed to update list");
+      setLists(previousLists);
+    }
+  };
 
-      if (source.droppableId === destination.droppableId) {
-        const reorderedTasks = reorder(
-          sourceList.tasks,
-          source.index,
-          destination.index
-        ).map((task, index) => ({
-          ...task,
-          position: index,
-        }));
+  const handleTaskDrag = async (
+    source: any,
+    destination: any,
+    previousLists: ListItem[]
+  ) => {
+    const sourceList = previousLists.find((l) => l.id === source.droppableId);
+    const destinationList = previousLists.find(
+      (l) => l.id === destination.droppableId
+    );
 
-        sourceList.tasks = reorderedTasks;
+    console.log("Sources: ", sourceList);
+    console.log("Destination: ", destinationList);
 
-        setLists([...previousLists]);
+    if (!sourceList || !destinationList) return;
 
-        try {
-          const { error, success } = await updateTaskOrderAction(
+    if (source.droppableId === destination.droppableId) {
+      const reorderedTasks = reorder(
+        sourceList.tasks,
+        source.index,
+        destination.index
+      ).map((task, index) => ({ ...task, position: index }));
+
+      sourceList.tasks = reorderedTasks;
+
+      setLists(
+        lists.map((list) =>
+          list.id === sourceList.id
+            ? { ...sourceList, tasks: reorderedTasks }
+            : list
+        )
+      );
+
+      try {
+        const { error, success } = await updateTaskOrderAction(
+          projectId,
+          destination.droppableId,
+          reorderedTasks
+        );
+
+        if (!success)
+          throw new Error(error || "Failed to update task position");
+
+        toast.success("Task position updated successfully");
+      } catch (err) {
+        toast.error("Failed to update task position");
+        setLists(previousLists);
+      }
+    } else {
+      const [movedTask] = sourceList.tasks.splice(source.index, 1);
+
+      if (!movedTask) return;
+
+      movedTask.listId = destination.droppableId;
+      movedTask.status = getStatusFromListTitle(destinationList.title);
+
+      destinationList.tasks.splice(destination.index, 0, movedTask);
+
+      sourceList.tasks.forEach((task, index) => (task.position = index));
+      destinationList.tasks.forEach((task, index) => (task.position = index));
+
+      setLists(
+        lists.map((list) =>
+          list.id === sourceList.id
+            ? { ...sourceList, tasks: [...sourceList.tasks] }
+            : list.id === destinationList.id
+            ? { ...destinationList, tasks: [...destinationList.tasks] }
+            : list
+        )
+      );
+
+      try {
+        const results = await Promise.allSettled([
+          updateTaskOrderAction(projectId, sourceList.id, sourceList.tasks),
+          updateTaskOrderAction(
             projectId,
-            destination.droppableId,
-            reorderedTasks
+            destinationList.id,
+            destinationList.tasks
+          ),
+          updateTaskAction(movedTask.id, {
+            ...movedTask,
+            status: movedTask.status,
+          }),
+        ]);
+
+        const errors = results
+          .filter(
+            (result) =>
+              result.status === "rejected" ||
+              (result.status === "fulfilled" && result.value?.error)
+          )
+          .map((result) =>
+            result.status === "rejected"
+              ? (result as PromiseRejectedResult).reason.message ||
+                "Unknown error"
+              : result.value?.error
           );
 
-          if (!success) {
-            throw new Error(error || "Failed to update task position");
-          }
-
-          toast.success("Task position updated successfully");
-        } catch (err) {
-          toast.error("Failed to update task position");
-          setLists(previousLists); // Rollback to previous state
+        if (errors.length > 0) {
+          toast.error(`Failed to move the task. Error: ${errors.join(", ")}`);
+          setLists(previousLists);
+        } else {
+          toast.success("Task moved successfully!");
         }
-      } else {
-        const [movedTask] = sourceList.tasks.splice(source.index, 1);
-        movedTask.listId = destination.droppableId;
-        destinationList.tasks.splice(destination.index, 0, movedTask);
-
-        sourceList.tasks.forEach((task, index) => {
-          task.position = index;
-        });
-
-        destinationList.tasks.forEach((task, index) => {
-          task.position = index;
-        });
-
-        setLists([...previousLists]);
-
-        try {
-          const results = await Promise.allSettled([
-            updateTaskOrderAction(projectId, sourceList.id, sourceList.tasks),
-            updateTaskOrderAction(
-              projectId,
-              destinationList.id,
-              destinationList.tasks
-            ),
-          ]);
-
-          const errors = results
-            .filter(
-              (result) =>
-                result.status === "rejected" ||
-                (result.status === "fulfilled" && result.value?.error)
-            )
-            .map((result) => {
-              if (result.status === "rejected") {
-                return (
-                  (result as PromiseRejectedResult).reason.message ||
-                  "Unknown error"
-                );
-              }
-              if (result.status === "fulfilled" && result.value.error) {
-                return result.value.error;
-              }
-            });
-
-          if (errors.length > 0) {
-            // If any of the promises failed, display an error message
-            toast.error(`Failed to move the task. Error: ${errors.join(", ")}`);
-            setLists(previousLists); // Rollback to previous state
-          } else {
-            // If all promises were successful
-            toast.success("Task moved successfully!");
-          }
-        } catch (err) {
-          // Handle any unexpected errors (unlikely with Promise.allSettled)
-          toast.error("An unexpected error occurred while moving the task.");
-          setLists(previousLists); // Rollback to previous state
-        }
+      } catch {
+        toast.error("An unexpected error occurred while moving the task.");
+        setLists(previousLists);
       }
     }
   };
 
-  const reorder = (list: any[], startIndex: number, lastIndex: number) => {
-    const result = Array.from(list);
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(lastIndex, 0, removed);
+  const handleDragEnd = async (result: DropResult) => {
+    const { destination, source, type } = result;
 
-    return result;
+    if (
+      !destination ||
+      (destination.droppableId === source.droppableId &&
+        destination.index === source.index)
+    )
+      return;
+
+    if (type === "LIST") {
+      await handleListDrag(source.index, destination.index, initialLists);
+    } else if (type === "TASK") {
+      console.log("Initial list: ", initialLists);
+      console.log("Prev lists: ", initialLists);
+      console.log("Source: ", source);
+      console.log("Destination: ", destination);
+      console.log("Data: ", initialLists);
+      await handleTaskDrag(source, destination, initialLists);
+    }
   };
 
   return (

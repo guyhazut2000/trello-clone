@@ -20,7 +20,6 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
     isPinnedPredicate
   );
 
-  console.log(projects[0].lists);
   return (
     <div className="flex-1 mx-auto space-y-4">
       {pinnedProjects.length > 0 && (

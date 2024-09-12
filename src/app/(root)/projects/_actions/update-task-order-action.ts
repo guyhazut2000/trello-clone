@@ -6,7 +6,6 @@ import { TaskItem } from "@/types";
 import { updateTasksOrder } from "@/data-access/tasks";
 import { getListById } from "@/data-access/lists";
 import { listToStatusMap } from "@/lib/utils";
-import { TaskStatus } from "@prisma/client";
 
 export const updateTaskOrderAction = async (
   projectId: string,
@@ -14,9 +13,6 @@ export const updateTaskOrderAction = async (
   tasks: TaskItem[]
 ) => {
   try {
-    console.log("List ID: ", listId);
-    console.log("Tasks: ", tasks);
-
     const list = await getListById(listId);
 
     const newTaskStatus =
