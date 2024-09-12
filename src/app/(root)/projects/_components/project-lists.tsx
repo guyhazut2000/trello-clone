@@ -1,27 +1,14 @@
 "use client";
 
-import { ChevronRight } from "lucide-react";
-import {
-  Draggable,
-  Droppable,
-  DragDropContext,
-  DropResult,
-} from "@hello-pangea/dnd";
-import { useCallback, useState } from "react";
-
+import React, { useCallback, useState } from "react";
+import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import { ListItem } from "@/types";
 import { toast } from "sonner";
-import {
-  cn,
-  getStatusFromListTitle,
-  sortListByPosition,
-  sortTasksByPosition,
-} from "@/lib/utils";
-
+import { cn, getStatusFromListTitle, sortListByPosition } from "@/lib/utils";
 import { updateListOrderAction } from "../_actions/update-list-order-action";
 import { updateTaskOrderAction } from "../_actions/update-task-order-action";
 import { updateTaskAction } from "../../tasks/_actions/update-task-action";
-import { cloneDeep } from "lodash";
+import { ProjectList } from "./project-list";
 
 interface ProjectListsProps {
   initialLists: ListItem[];
@@ -81,9 +68,6 @@ export const ProjectLists = ({
     const destinationList = previousLists.find(
       (l) => l.id === destination.droppableId
     );
-
-    console.log("Sources: ", sourceList);
-    console.log("Destination: ", destinationList);
 
     if (!sourceList || !destinationList) return;
 
@@ -195,11 +179,6 @@ export const ProjectLists = ({
     if (type === "LIST") {
       await handleListDrag(source.index, destination.index, initialLists);
     } else if (type === "TASK") {
-      console.log("Initial list: ", initialLists);
-      console.log("Prev lists: ", initialLists);
-      console.log("Source: ", source);
-      console.log("Destination: ", destination);
-      console.log("Data: ", initialLists);
       await handleTaskDrag(source, destination, initialLists);
     }
   };
@@ -214,76 +193,11 @@ export const ProjectLists = ({
             {...provided.droppableProps}
           >
             {initialLists.length > 0 ? (
-              initialLists.sort(sortListByPosition).map((list, index) => (
-                <Draggable key={list.id} draggableId={list.id} index={index}>
-                  {(provided, snapshot) => (
-                    <div
-                      className={cn(
-                        "rounded-lg shadow-md flex flex-col gap-3 p-4 transition-all duration-300 ease-in-out hover:shadow-lg",
-                        snapshot.isDragging
-                          ? "bg-gray-200 scale-105 shadow-lg"
-                          : "bg-gray-50"
-                      )}
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      <div className="flex justify-between items-center">
-                        <h3 className="font-semibold text-lg text-gray-800">
-                          {list.title}
-                        </h3>
-                        <span className="select-none">{list.tasks.length}</span>
-                      </div>
-
-                      <Droppable droppableId={list.id} type="TASK">
-                        {(provided) => (
-                          <div
-                            className="space-y-2 flex-grow"
-                            ref={provided.innerRef}
-                            {...provided.droppableProps}
-                          >
-                            {list.tasks.length > 0 ? (
-                              list.tasks
-                                .sort(sortTasksByPosition)
-                                .map((task, taskIndex) => (
-                                  <Draggable
-                                    key={task.id}
-                                    draggableId={`task-${task.id}`}
-                                    index={taskIndex}
-                                  >
-                                    {(provided, snapshot) => (
-                                      <div
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        className={cn(
-                                          "bg-white p-3 rounded shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between group",
-                                          snapshot.isDragging
-                                            ? "bg-blue-200 scale-105 shadow-lg"
-                                            : "bg-white"
-                                        )}
-                                      >
-                                        <span className="truncate">
-                                          {task.title}
-                                        </span>
-                                        <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0 transform transition-transform duration-200 ease-in-out group-hover:translate-x-1" />
-                                      </div>
-                                    )}
-                                  </Draggable>
-                                ))
-                            ) : (
-                              <div className="text-gray-500 italic">
-                                No tasks yet
-                              </div>
-                            )}
-                            {provided.placeholder}
-                          </div>
-                        )}
-                      </Droppable>
-                    </div>
-                  )}
-                </Draggable>
-              ))
+              initialLists
+                .sort(sortListByPosition)
+                .map((list, index) => (
+                  <ProjectList key={list.id} list={list} index={index} />
+                ))
             ) : (
               <div className="col-span-full flex justify-center">
                 You have no lists
