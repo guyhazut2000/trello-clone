@@ -3,25 +3,23 @@
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
 
-import { getListById } from "@/data-access/lists";
+import { createTask } from "@/data-access/task";
+import { getProjectById } from "@/data-access/project";
+import { statusToListMap } from "@/lib/utils";
 
 import { createTaskSchema } from "../validation";
-import { createTask } from "@/data-access/tasks";
-import { getProjectById } from "@/data-access/projects";
-import { TaskStatus } from "@/types";
-import { statusToListMap } from "@/lib/utils";
 
 export const createTaskAction = async (
   projectId: string,
   values: z.infer<typeof createTaskSchema>
 ) => {
-  const validatedValues = createTaskSchema.safeParse(values);
-
-  if (!validatedValues.success) {
-    throw new Error("Invalid values");
-  }
-
   try {
+    const validatedValues = createTaskSchema.safeParse(values);
+
+    if (!validatedValues.success) {
+      throw new Error("Invalid values");
+    }
+
     const project = await getProjectById(projectId);
 
     if (!project) {
@@ -55,9 +53,7 @@ export const createTaskAction = async (
       success: true,
       data: newTask,
     };
-  } catch (err) {
-    return {
-      error: "Failed to create task",
-    };
+  } catch (error) {
+    return { success: false, error: (error as Error).message };
   }
 };

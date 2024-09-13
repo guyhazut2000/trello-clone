@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { deleteListWithTasks } from "@/data-access/lists";
+import { deleteListWithTasks } from "@/data-access/list";
 
 export const deleteListAction = async (projectId: string, listId: string) => {
   try {

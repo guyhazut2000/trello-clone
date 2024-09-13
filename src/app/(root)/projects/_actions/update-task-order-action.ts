@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 
 import { TaskItem } from "@/types";
-import { updateTasksOrder } from "@/data-access/tasks";
-import { getListById } from "@/data-access/lists";
+import { updateTasksOrder } from "@/data-access/task";
+import { getListById } from "@/data-access/list";
 import { listToStatusMap } from "@/lib/utils";
 
 export const updateTaskOrderAction = async (

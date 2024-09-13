@@ -2,9 +2,11 @@
 
 import React from "react";
 import { Draggable } from "@hello-pangea/dnd";
-import { ChevronRight } from "lucide-react";
+
 import { cn } from "@/lib/utils";
 import { TaskItem } from "@/types";
+
+import { EditTaskSheet } from "./edit-task-sheet";
 
 interface ProjectTaskProps {
   task: TaskItem;
@@ -15,18 +17,17 @@ export const ProjectTask = ({ task, index }: ProjectTaskProps) => {
   return (
     <Draggable draggableId={`task-${task.id}`} index={index}>
       {(provided, snapshot) => (
-        <div
+        <span
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
           className={cn(
-            "bg-white p-3 rounded shadow-sm hover:shadow-md transition-all duration-200 flex items-center justify-between group",
-            snapshot.isDragging ? "bg-blue-200 scale-105 shadow-lg" : "bg-white"
+            "bg-white hover:bg-blue-100 cursor-pointer w-full rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-between ",
+            snapshot.isDragging ? "bg-blue-100 scale-105 shadow-xl" : "bg-white"
           )}
         >
-          <span className="truncate">{task.title}</span>
-          <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0 transform transition-transform duration-200 ease-in-out group-hover:translate-x-1" />
-        </div>
+          <EditTaskSheet task={task} />
+        </span>
       )}
     </Draggable>
   );

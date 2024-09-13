@@ -4,7 +4,7 @@ import { z } from "zod";
 import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
-import { createProject } from "@/data-access/projects";
+import { createProject } from "@/data-access/project";
 
 import { createProjectSchema } from "../validation";
 import { createProjectListAction } from "./create-list-action";
@@ -12,11 +12,11 @@ import { createProjectListAction } from "./create-list-action";
 export const createProjectAction = async (
   values: z.infer<typeof createProjectSchema>
 ) => {
-  const { userId } = auth();
-
-  if (!userId) throw new Error("Unauthorized");
-
   try {
+    const { userId } = auth();
+
+    if (!userId) throw new Error("Unauthorized");
+
     const validatedValues = createProjectSchema.safeParse(values);
 
     if (!validatedValues.success) {

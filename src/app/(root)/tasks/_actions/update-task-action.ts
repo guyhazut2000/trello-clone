@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { TaskItem } from "@/types";
-import { updateTask } from "@/data-access/tasks";
+import { updateTask } from "@/data-access/task";
 
 export const updateTaskAction = async (
   taskId: string,

@@ -4,7 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import { ListTodo } from "lucide-react";
 import { notFound, redirect } from "next/navigation";
 
-import { getProjectById } from "@/data-access/projects";
+import { getProjectById } from "@/data-access/project";
 import { Metadata, ResolvingMetadata } from "next";
 import { Label } from "@/components/ui/label";
 

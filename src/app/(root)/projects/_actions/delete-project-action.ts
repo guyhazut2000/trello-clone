@@ -1,6 +1,6 @@
 "use server";
 
-import { deleteProject } from "@/data-access/projects";
+import { deleteProject } from "@/data-access/project";
 import { revalidatePath } from "next/cache";
 
 export const deleteProjectAction = async (projectId: string) => {

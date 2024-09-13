@@ -4,7 +4,7 @@ import { User2Icon } from "lucide-react";
 import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 
-import { getProjects } from "@/data-access/projects";
+import { getProjects } from "@/data-access/project";
 import { CreateProjectAnimation } from "@/components/animations/create-project-animation";
 
 import { ProjectSearchInput } from "../_components/project-search-input";

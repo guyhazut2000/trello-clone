@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { auth } from "@clerk/nextjs/server";
 
-import { deleteTask } from "@/data-access/tasks";
+import { deleteTask } from "@/data-access/task";
 
 export const deleteTaskAction = async (
   projectId: string,

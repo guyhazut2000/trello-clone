@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { updateListsOrder } from "@/data-access/lists";
+import { updateListsOrder } from "@/data-access/list";
 import { ListItem } from "@/types";
 
 export const updateListOrderAction = async (

@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { getProjectById, updateProjectById } from "@/data-access/projects";
+import { getProjectById, updateProjectById } from "@/data-access/project";
 
 export const TogglePinProjectAction = async (projectId: string) => {
   try {
