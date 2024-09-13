@@ -55,6 +55,10 @@ export const editTaskSchema = z.object({
   deadline: z.date(),
 });
 
+export const deleteTaskSchema = z.object({
+  id: z.string().min(1, "Title is required"),
+});
+
 export const updateListOrderSchema = z.object({
   lists: z.array(
     z.object({
