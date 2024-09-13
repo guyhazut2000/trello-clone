@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 
 import { EditTaskForm } from "./edit-task-form";
 import { DeleteTaskSheet } from "./delete-task-sheet";
+import TaskBadge from "@/components/task-badge";
 
 interface EditTaskSheetProps {
   task: TaskItem;
@@ -44,8 +45,8 @@ export const EditTaskSheet = ({ task }: EditTaskSheetProps) => {
             <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0 transform transition-transform duration-200 ease-in-out group-hover:translate-x-1" />
           </div>
           <div className="flex gap-x-2">
-            <Badge>{task.priority}</Badge>
-            <Badge>{task.type}</Badge>
+            <TaskBadge priority={task.priority} />
+            <TaskBadge type={task.type} />
           </div>
         </div>
       </SheetTrigger>
