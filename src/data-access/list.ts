@@ -22,12 +22,9 @@ export const getListById = async (id: string) => {
   });
 };
 
-export const getListByStatus = async (
-  projectId: string,
-  status: TaskStatus
-) => {
+export const getListByTitle = async (projectId: string, title: string) => {
   return await prisma.list.findUnique({
-    where: { id: projectId },
+    where: { id: projectId, title },
     include: {
       tasks: true,
     },

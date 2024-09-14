@@ -7,14 +7,18 @@ import { updateTask } from "@/data-access/task";
 
 export const updateTaskAction = async (
   taskId: string,
-  task: Partial<TaskItem>
+  task: Partial<TaskItem>,
+  projectId?: string
 ) => {
   try {
     if (!taskId) throw new Error("taskId is required");
+
     const updatedTask = await updateTask(taskId, task);
 
     revalidatePath(`/projects`);
     revalidatePath(`/tasks/${taskId}`);
+    projectId && revalidatePath(`/projects/${projectId}/tasks/${taskId}`);
+
     return {
       success: true,
       data: updatedTask,

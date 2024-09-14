@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { toast } from "sonner";
+import { useState } from "react";
 
 import { TaskItem, TaskPriority, TaskStatus, TaskType } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,6 +17,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DeleteTaskSheet } from "@/app/(root)/projects/_components/delete-task-sheet";
+import { Input } from "@/components/ui/input";
+import useClickOutside from "@/hooks/useOnClickOutside";
+import { updateTaskAction } from "@/app/(root)/tasks/_actions/update-task-action";
+import { getListByTitle } from "@/data-access/list";
 
 interface TaskDetailViewProps {
   projectId: string;
@@ -29,15 +33,43 @@ export default function TaskDetailView({
   projectId,
   listId,
 }: TaskDetailViewProps) {
+  const [status, setStatus] = useState(task.status);
+
+  const { ref, handleInputChange } = useClickOutside(async () => {
+    try {
+      const { success, error } = await updateTaskAction(
+        task.id,
+        {
+          title: ref.current?.value || task.title,
+        },
+        projectId
+      );
+
+      if (success) {
+        toast.success("Task updated successfully");
+      } else {
+        toast.error("Failed to update task");
+      }
+    } catch (err) {
+      toast.error("Failed to update task");
+    }
+  });
+
   return (
-    <div className="container mx-auto p-4">
-      <div className="flex items-center justify-between mb-4">
+    <div className="container mx-auto ">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-center space-x-2">
-          <Button asChild variant={"link"} className="text-sm text-blue-500">
+          <Button
+            asChild
+            variant={"link"}
+            className="px-0 text-sm text-blue-500"
+          >
             <Link href={"/tasks"}>All Work Items</Link>
           </Button>
           <span className="text-sm text-gray-500">&gt;</span>
-          <span className="text-sm font-semibold">{task.title}</span>
+          <span className="text-sm font-semibold select-none">
+            {task.title}
+          </span>
         </div>
         <DeleteTaskSheet
           taskId={task.id}
@@ -50,16 +82,46 @@ export default function TaskDetailView({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">{task.title}</CardTitle>
+          <CardTitle className="text-2xl font-bold">
+            <Input
+              ref={ref}
+              onChange={handleInputChange}
+              defaultValue={task.title}
+            />
+          </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-3 gap-4 mb-4">
+          <div className="grid grid-cols-3 gap-2 mb-2">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 select-none">
                 Status
               </label>
-              <Select defaultValue={task.status}>
-                <SelectTrigger className="w-full mt-1">
+              <Select
+                defaultValue={task.status}
+                onValueChange={async (newStatus: keyof typeof TaskStatus) => {
+                  try {
+                    if (newStatus === task.status) return;
+
+                    const { success } = await updateTaskAction(
+                      task.id,
+                      {
+                        status: newStatus,
+                        listId: listId,
+                      },
+                      projectId
+                    );
+                    if (success) {
+                      toast.success("Task status updated successfully");
+                    } else {
+                      toast.error("Failed to update task status");
+                    }
+                  } catch (err) {
+                    console.log(err);
+                    toast.error("Failed to update task status");
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full mt-1 ">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -72,11 +134,31 @@ export default function TaskDetailView({
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 select-none">
                 Priority
               </label>
-              <Select defaultValue={task.priority}>
-                <SelectTrigger className="w-full mt-1">
+              <Select
+                defaultValue={task.priority}
+                onValueChange={async (
+                  newPriority: keyof typeof TaskPriority
+                ) => {
+                  try {
+                    const { success } = await updateTaskAction(
+                      task.id,
+                      { priority: newPriority },
+                      projectId
+                    );
+                    if (success) {
+                      toast.success("Task priority updated successfully");
+                    } else {
+                      toast.error("Failed to update task priority");
+                    }
+                  } catch (err) {
+                    toast.error("Failed to update task priority");
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full mt-1 ">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -89,11 +171,29 @@ export default function TaskDetailView({
               </Select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium text-gray-700 select-none">
                 Type
               </label>
-              <Select defaultValue={task.type}>
-                <SelectTrigger className="w-full mt-1">
+              <Select
+                defaultValue={task.type}
+                onValueChange={async (newType: keyof typeof TaskType) => {
+                  try {
+                    const { success } = await updateTaskAction(
+                      task.id,
+                      { type: newType },
+                      projectId
+                    );
+                    if (success) {
+                      toast.success("Task type updated successfully");
+                    } else {
+                      toast.error("Failed to update task type");
+                    }
+                  } catch (err) {
+                    toast.error("Failed to update task type");
+                  }
+                }}
+              >
+                <SelectTrigger className="w-full mt-1 ">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -112,8 +212,9 @@ export default function TaskDetailView({
             </label>
             <Textarea
               placeholder="Enter task description"
+              rows={8}
               defaultValue={task.description || ""}
-              className="w-full h-64"
+              className="w-full"
             />
           </div>
         </CardContent>
