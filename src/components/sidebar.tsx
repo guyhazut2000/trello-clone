@@ -1,6 +1,10 @@
-import { routes } from "@/config/routes";
+"use client";
+
 import Link from "next/link";
 import React from "react";
+import { usePathname } from "next/navigation";
+
+import { routes } from "@/config/routes";
 
 export const Sidebar = () => {
   return (
@@ -21,14 +25,28 @@ interface SidebarItemProps {
 }
 
 const SidebarItem = ({ route }: SidebarItemProps) => {
+  const pathname = usePathname(); // Get the current path
   const Icon = route.icon;
+
+  // Check if the current path matches the route path to mark the item as active
+  const isActive =
+    route.path === "/"
+      ? pathname === "/"
+      : pathname.startsWith(route.path.toLowerCase());
 
   return (
     <Link
       href={route.path}
-      className="flex items-center space-x-2 w-full hover:bg-gray-100 rounded-lg px-2 py-1 cursor-pointer select-none"
+      className={`flex items-center space-x-2 w-full rounded-lg px-2 py-1 cursor-pointer select-none 
+        ${
+          isActive
+            ? "bg-blue-100 text-blue-400"
+            : "hover:bg-gray-100 text-gray-500"
+        }`}
     >
-      <Icon className="h-5 w-5" />
+      <Icon
+        className={`h-5 w-5 ${isActive ? "text-blue-400" : "text-gray-500"}`}
+      />
       <span>{route.name}</span>
     </Link>
   );
