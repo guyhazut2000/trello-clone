@@ -27,10 +27,12 @@ export const ProjectList = ({ list, index }: ProjectListProps) => {
           {...provided.dragHandleProps}
         >
           <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-lg text-gray-800">
+            <h3 className="font-semibold text-lg text-gray-800 flex justify-center items-center gap-x-2">
               {list.title}
+              <span className="select-none bg-gray-200 rounded-md px-3 py-1">
+                {list.tasks.length}
+              </span>
             </h3>
-            <span className="select-none">{list.tasks.length}</span>
           </div>
 
           <Droppable droppableId={list.id} type="TASK">
@@ -40,19 +42,17 @@ export const ProjectList = ({ list, index }: ProjectListProps) => {
                 ref={provided.innerRef}
                 {...provided.droppableProps}
               >
-                {list.tasks.length > 0 ? (
-                  list.tasks
-                    .sort(sortTasksByPosition)
-                    .map((task, taskIndex) => (
-                      <ProjectTask
-                        key={task.id}
-                        task={task}
-                        index={taskIndex}
-                      />
-                    ))
-                ) : (
-                  <div className="text-gray-500 italic">No tasks yet</div>
-                )}
+                {list.tasks.length > 0
+                  ? list.tasks
+                      .sort(sortTasksByPosition)
+                      .map((task, taskIndex) => (
+                        <ProjectTask
+                          key={task.id}
+                          task={task}
+                          index={taskIndex}
+                        />
+                      ))
+                  : null}
                 {provided.placeholder}
               </div>
             )}
