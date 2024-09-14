@@ -25,6 +25,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { SubmitButton } from "@/components/submit-button";
 
 import { createProjectSchema } from "../projects/validation";
@@ -43,8 +44,10 @@ export const CreateProjectSheet = () => {
       </SheetTrigger>
       <SheetContent className="gap-4 flex flex-col">
         <SheetHeader>
-          <SheetTitle>Create Project</SheetTitle>
-          <SheetDescription>Create your project here. </SheetDescription>
+          <SheetTitle>New Project Setup</SheetTitle>
+          <SheetDescription>
+            Provide the necessary details to start your project.
+          </SheetDescription>
         </SheetHeader>
         <CreateProjectForm setShowSheet={setShowSheet} />
       </SheetContent>
@@ -95,9 +98,6 @@ const CreateProjectForm = ({ setShowSheet }: CreateProjectFormProps) => {
               <FormControl>
                 <Input placeholder="Enter project title..." {...field} />
               </FormControl>
-              <FormDescription>
-                This is your project display name.
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -109,14 +109,12 @@ const CreateProjectForm = ({ setShowSheet }: CreateProjectFormProps) => {
             <FormItem>
               <FormLabel>Project Description</FormLabel>
               <FormControl>
-                <Input
+                <Textarea
+                  rows={12}
                   placeholder="Enter a brief description of the project..."
                   {...field}
                 />
               </FormControl>
-              <FormDescription>
-                This is your project display name.
-              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
