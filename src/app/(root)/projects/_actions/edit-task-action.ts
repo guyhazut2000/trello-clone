@@ -23,7 +23,7 @@ export const editTaskAction = async (
       throw new Error("Invalid values");
     }
 
-    const task = await getTaskById(taskId);
+    const task = await getTaskById(taskId, { include: { list: true } });
 
     if (!task) {
       throw new Error("Task not found");

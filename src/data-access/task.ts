@@ -33,9 +33,12 @@ export const updateTask = async (taskId: string, task: Partial<TaskItem>) => {
   });
 };
 
-export const getTaskById = async (taskId: string) => {
+export const getTaskById = async (
+  taskId: string,
+  options?: { include: { list: boolean } }
+) => {
   return await prisma.task.findUnique({
     where: { id: taskId },
-    include: { list: true },
+    include: options?.include,
   });
 };
