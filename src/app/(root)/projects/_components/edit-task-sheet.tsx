@@ -51,7 +51,7 @@ export const EditTaskSheet = ({ task }: EditTaskSheetProps) => {
         <SheetHeader className="w-full">
           <div className="flex flex-row w-full justify-between items-center">
             <SheetTitle>Edit task</SheetTitle>
-            <div className="flex gap-x-4 items-center px-6">
+            <div className="flex gap-x-1 items-center px-2">
               <TaskFullView
                 href={`/projects/${params.projectId}/tasks/${task.id}`}
               />
