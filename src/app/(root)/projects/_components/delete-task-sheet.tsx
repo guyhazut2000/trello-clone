@@ -2,7 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Trash } from "lucide-react";
+import { Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 import { deleteTaskAction } from "../_actions/delete-task-action";
 import {
@@ -15,7 +16,12 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface DeleteTaskSheetProps {
   taskId: string;
@@ -59,9 +65,18 @@ export const DeleteTaskSheet = ({
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger asChild>
-        <Trash className="h-6 w-6 text-red-500 cursor-pointer hover:opacity-80 transition-all" />
-      </SheetTrigger>
+      <TooltipProvider delayDuration={100}>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <SheetTrigger asChild>
+              <Button variant={"ghost"}>
+                <Trash2 className="h-6 w-6 text-red-500 cursor-pointer hover:opacity-80 transition-all" />
+              </Button>
+            </SheetTrigger>
+          </TooltipTrigger>
+          <TooltipContent>Delete</TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
       <SheetContent className="w-full" isNested={isNested}>
         <SheetHeader>
           <SheetTitle>Delete Task</SheetTitle>
