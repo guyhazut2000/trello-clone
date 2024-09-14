@@ -15,12 +15,15 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { useRouter } from "next/navigation";
 
 interface DeleteTaskSheetProps {
   taskId: string;
   listId: string;
   projectId: string;
-  setSheetOpen: (open: boolean) => void;
+  setSheetOpen?: (open: boolean) => void;
+  isNested?: boolean;
+  redirect?: boolean;
 }
 
 export const DeleteTaskSheet = ({
@@ -28,9 +31,13 @@ export const DeleteTaskSheet = ({
   projectId,
   listId,
   setSheetOpen,
+  isNested = true,
+  redirect = false,
 }: DeleteTaskSheetProps) => {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
+
+  const router = useRouter();
 
   const handleDeleteTask = async () => {
     try {
@@ -39,7 +46,8 @@ export const DeleteTaskSheet = ({
 
         if (success) {
           toast.success("Task deleted successfully!");
-          setSheetOpen(false);
+          setSheetOpen && setSheetOpen(false);
+          redirect && router.push(`/projects/${projectId}`);
         } else {
           toast.error("Failed to delete task");
         }
@@ -52,9 +60,9 @@ export const DeleteTaskSheet = ({
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Trash className="h-6 w-6 text-red-500 cursor-pointer hover:bg-gray-100 transition-all" />
+        <Trash className="h-6 w-6 text-red-500 cursor-pointer hover:opacity-80 transition-all" />
       </SheetTrigger>
-      <SheetContent className="w-full" isNested>
+      <SheetContent className="w-full" isNested={isNested}>
         <SheetHeader>
           <SheetTitle>Delete Task</SheetTitle>
           <SheetDescription>
