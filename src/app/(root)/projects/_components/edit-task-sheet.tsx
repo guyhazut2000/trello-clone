@@ -2,7 +2,16 @@
 
 import { useState } from "react";
 import { ChevronRight, Fullscreen } from "lucide-react";
+import { useParams } from "next/navigation";
+import Link from "next/link";
 
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import TaskBadge from "@/components/task-badge";
 import {
   Sheet,
   SheetContent,
@@ -13,20 +22,8 @@ import {
 } from "@/components/ui/sheet";
 import { TaskItem } from "@/types";
 
-import { useParams } from "next/navigation";
-import Link from "next/link";
-
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { Badge } from "@/components/ui/badge";
-
 import { EditTaskForm } from "./edit-task-form";
 import { DeleteTaskSheet } from "./delete-task-sheet";
-import TaskBadge from "@/components/task-badge";
 
 interface EditTaskSheetProps {
   task: TaskItem;
@@ -40,7 +37,7 @@ export const EditTaskSheet = ({ task }: EditTaskSheetProps) => {
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
       <SheetTrigger asChild>
         <div className="flex flex-col justify-center p-2 w-full">
-          <div className="p-4 flex items-center space-x-2 justify-between w-full cursor-pointer">
+          <div className="p-2 py-4 flex items-center space-x-2 justify-between w-full cursor-pointer">
             <span className="truncate text-gray-700">{task.title}</span>
             <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0 transform transition-transform duration-200 ease-in-out group-hover:translate-x-1" />
           </div>
