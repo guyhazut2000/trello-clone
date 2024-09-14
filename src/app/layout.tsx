@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <ClerkProvider>
           {children}
-          <Toaster />
+          <Toaster richColors />
         </ClerkProvider>
       </body>
     </html>
