@@ -21,7 +21,7 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
   );
 
   return (
-    <div className="flex-1 mx-auto space-y-4">
+    <div className="space-y-4">
       {pinnedProjects.length > 0 && (
         <>
           <div className="flex items-center gap-x-2 border p-2 rounded-lg bg-gray-50">

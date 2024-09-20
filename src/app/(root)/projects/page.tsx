@@ -31,7 +31,7 @@ export default async function ProjectsPage() {
   }
 
   return (
-    <div className="space-y-8 w-full h-full py-4">
+    <div className="container mx-auto space-y-8 w-full h-full py-4">
       <div className="flex items-center font-semibold text-lg text-neutral-700">
         <User2Icon className="h-6 w-6 mr-2" />
         Your Projects
