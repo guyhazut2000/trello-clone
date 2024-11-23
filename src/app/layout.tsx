@@ -23,8 +23,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // Create a client
-
   return (
     <html lang="en">
       <body className={inter.className}>
