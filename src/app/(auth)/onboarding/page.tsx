@@ -16,7 +16,7 @@ interface DatabaseSyncStatus {
   // Add other fields if needed
 }
 
-const WelcomePage = () => {
+const OnboardingPage = () => {
   const router = useRouter();
 
   const { timeoutReached } = useTimeout(10000);
@@ -179,4 +179,4 @@ const BackgroundPattern = (props: LucideProps) => {
   );
 };
 
-export default WelcomePage;
+export default OnboardingPage;
