@@ -6,6 +6,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "sonner";
 
 import "./globals.css";
+import { Providers } from "@/components/providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,13 +23,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Create a client
+
   return (
     <html lang="en">
       <body className={inter.className}>
         <ClerkProvider>
-          {children}
-          <Toaster richColors />
+          <Providers>{children}</Providers>
         </ClerkProvider>
+        <Toaster richColors />
       </body>
     </html>
   );

@@ -6,40 +6,75 @@ import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import { Heading } from "@/components/heading";
-import { LoadingSpinner } from "@/components/loading-spinner";
 
 import { getDatabaseSyncStatus } from "../_actions/auth";
+import { useTimeout } from "@/hooks/useTimeout";
+import { Loader } from "@/components/loader";
+
+interface DatabaseSyncStatus {
+  isUserSynced: boolean;
+  // Add other fields if needed
+}
 
 const WelcomePage = () => {
   const router = useRouter();
 
-  // Sleep for 3 seconds
-  useEffect(() => {
-    setTimeout(() => {}, 3000);
-  }, []);
+  const { timeoutReached } = useTimeout(10000);
 
-  const { data } = useQuery({
-    queryFn: getDatabaseSyncStatus,
+  const { data, isLoading, isError, error } = useQuery<DatabaseSyncStatus>({
+    queryFn: async () => await getDatabaseSyncStatus(),
     queryKey: ["get-database-sync-status"],
-    refetchInterval: (query) => {
-      return query.state.data?.isUserSynced ? false : 1000;
+    refetchInterval: (data) => {
+      // Refetch every second if the user is not synced
+      return data?.state.data?.isUserSynced
+        ? false
+        : timeoutReached
+        ? false
+        : 1000;
     },
+    retry: 10, // Optional: Limits retries
   });
 
   useEffect(() => {
-    if (data?.isUserSynced) router.push("/");
+    if (data?.isUserSynced) {
+      router.push("/");
+    }
   }, [data, router]);
+
+  if (isLoading && !timeoutReached) {
+    return (
+      <div className="flex flex-col gap-4 w-full flex-1 items-center justify-center px-4">
+        <BackgroundPattern className="absolute inset-0 left-1/2 z-0 -translate-x-1/2 opacity-75" />
+
+        <Heading>Loading</Heading>
+        <Loader />
+      </div>
+    );
+  }
+
+  if (timeoutReached || isError) {
+    return (
+      <div className="flex flex-col w-full flex-1 items-center justify-center px-4">
+        <Heading>Error</Heading>
+        <p>
+          {timeoutReached
+            ? "Timed out while creating your account."
+            : error?.message || "Something went wrong!"}
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex w-full flex-1 items-center justify-center px-4">
       <BackgroundPattern className="absolute inset-0 left-1/2 z-0 -translate-x-1/2 opacity-75" />
 
       <div className="relative z-10 flex -translate-y-1/2 flex-col items-center gap-6 text-center">
-        <LoadingSpinner size="md" />
         <Heading>Creating your account...</Heading>
         <p className="text-base/7 text-gray-600 max-w-prose">
           Just a moment while we set things up for you.
         </p>
+        <Loader />
       </div>
     </div>
   );
