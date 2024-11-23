@@ -9,8 +9,6 @@ export const config = {
   ],
 };
 
-const isOnboardingRoute = createRouteMatcher(["/onboarding"]);
-
 const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
@@ -18,16 +16,6 @@ const isPublicRoute = createRouteMatcher([
 ]);
 
 export default clerkMiddleware((auth, request) => {
-  console.log("Request: ", request.url);
-
-  // Check if user is authenticated but hasn't completed onboarding
-  const { userId } = auth();
-
-  if (userId && request.url.includes("/onboarding")) {
-    // You could add additional logic here to check if user needs onboarding
-    return Response.redirect(new URL("/onboarding", request.url));
-  }
-
   if (!isPublicRoute(request)) {
     auth().protect();
   }
