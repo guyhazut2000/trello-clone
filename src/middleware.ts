@@ -12,7 +12,6 @@ export const config = {
 const isPublicRoute = createRouteMatcher([
   "/sign-in(.*)",
   "/sign-up(.*)",
-  "/welcome",
   "/api/webhooks(.*)",
 ]);
 
