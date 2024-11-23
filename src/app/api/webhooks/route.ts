@@ -43,26 +43,56 @@ export async function POST(req: Request) {
   // Handle the webhook event
   try {
     const eventType = evt.type;
-    console.log(`Processing webhook: ${eventType}`);
 
     if (eventType === "user.created") {
-      const { id, email_addresses, image_url, first_name, last_name } =
-        evt.data;
+      const {
+        id,
+        first_name,
+        last_name,
+        email_addresses,
+        username,
+        image_url,
+        phone_numbers,
+        external_accounts,
+        created_at,
+        updated_at,
+      } = evt.data;
+
+      const primaryEmail = email_addresses?.[0]?.email_address;
+      const primaryPhone = phone_numbers?.[0]?.phone_number;
+      const externalAccount = external_accounts?.[0];
 
       await prisma.user.create({
         data: {
-          externalId: id as string,
-          email: email_addresses[0]?.email_address,
+          email: primaryEmail,
           name: `${first_name || ""} ${last_name || ""}`.trim(),
-          imageUrl: image_url,
+          firstName: first_name as string,
+          lastName: last_name as string,
+          imageUrl: image_url as string,
+          username: username as string,
+          phoneNumber: primaryPhone,
+
+          // External provider info (if user signed up with OAuth)
+          externalId: id,
+          provider: externalAccount?.provider,
+
+          // Timestamps
+          lastSignInAt: new Date(),
+          createdAt: new Date(created_at),
+          updatedAt: new Date(updated_at),
         },
       });
+
       console.log("User created successfully:", id);
+      return new Response("User created", { status: 201 });
     }
 
-    return new Response("Webhook processed successfully", { status: 200 });
+    return new Response("Webhook processed", { status: 200 });
   } catch (error) {
     console.error("Error processing webhook:", error);
-    return new Response("Error processing webhook", { status: 500 });
+    return new Response(
+      `Error processing webhook: ${(error as Error).message}`,
+      { status: 500 }
+    );
   }
 }

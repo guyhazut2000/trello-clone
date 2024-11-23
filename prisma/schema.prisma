@@ -82,9 +82,26 @@ model Task {
 }
 
 model User {
-  id String @id @default(uuid())
-  externalId String @unique
-  email String @unique
-  name String
-  imageUrl String
+  id            String    @id        @default(uuid())         
+  email         String?   @unique
+  name          String?
+  firstName     String?
+  lastName      String?
+  imageUrl      String?
+  username      String?   @unique
+  
+  // Metadata
+  externalId    String?   @unique            // Clerk user ID
+  provider      String?                      // Auth provider (e.g., "google", "github")
+  
+  // Profile info
+  bio           String?   @db.Text
+  phoneNumber   String?
+  
+  // Timestamps
+  lastSignInAt  DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([email])
 }
