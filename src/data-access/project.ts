@@ -1,7 +1,7 @@
 "use server";
 
 import prisma from "@/lib/db";
-import { CreateProjectBody, ProjectItem } from "@/types";
+import { CreateProjectBody, ProjectItem } from "@/types/index";
 import { Prisma } from "@prisma/client";
 
 type GetProjectOptions = {

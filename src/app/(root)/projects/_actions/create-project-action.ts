@@ -1,20 +1,25 @@
 "use server";
 
 import { z } from "zod";
-import { auth } from "@clerk/nextjs/server";
 import { revalidatePath } from "next/cache";
 
 import { createProject } from "@/data-access/project";
 
 import { createProjectSchema } from "../validation";
 import { createProjectListAction } from "./create-list-action";
+import { auth } from "@clerk/nextjs/server";
 
 export const createProjectAction = async (
   values: z.infer<typeof createProjectSchema>
 ) => {
   try {
     // Authentication check (no throw, just return structured error response)
-    const { userId } = auth();
+    const { userId, sessionClaims } = auth();
+    /* It looks like there is a typo in the code. The line `console.log("Role: ", sessionClaimsrole);`
+    should be corrected to `console.log("Role: ", sessionClaims.role);`. */
+    console.log("Role: ", sessionClaims?.role);
+    console.log("App User ID: ", sessionClaims?.appUserId);
+
     if (!userId) {
       return { success: false, error: "Unauthorized: No user ID provided" };
     }
