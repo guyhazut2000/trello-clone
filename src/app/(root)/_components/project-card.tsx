@@ -1,6 +1,6 @@
 "use client";
 
-import { MoreVertical, Pin, Trash2 } from "lucide-react";
+import { MoreVertical, Pin } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 

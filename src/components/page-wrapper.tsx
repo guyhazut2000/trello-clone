@@ -5,5 +5,7 @@ interface PageWrapperProps {
 }
 
 export function PageWrapper({ children }: PageWrapperProps) {
-  return <section className="h-full w-full p-4 mx-auto">{children}</section>;
+  return (
+    <section className="container p-4 mx-auto space-y-4">{children}</section>
+  );
 }

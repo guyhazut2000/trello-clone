@@ -9,6 +9,8 @@ import { CreateProjectAnimation } from "@/components/animations/create-project-a
 
 import { CreateProjectSheet } from "../_components/create-project-sheet";
 import { ProjectList } from "../_components/project-list";
+import { PageWrapper } from "@/components/page-wrapper";
+import { Heading } from "@/components/heading";
 
 export default async function ProjectsPage() {
   const { userId: ClerkUserId, sessionClaims } = auth();
@@ -32,13 +34,13 @@ export default async function ProjectsPage() {
   }
 
   return (
-    <div className="container mx-auto space-y-8 w-full h-full py-4">
-      <div className="text-primary flex items-center font-semibold text-lg text-neutral-700">
+    <PageWrapper>
+      <Heading>
         <User2Icon className="h-6 w-6 mr-2" />
-        Your Projects
-      </div>
+        Projects
+      </Heading>
 
       <ProjectList projects={projects} />
-    </div>
+    </PageWrapper>
   );
 }
