@@ -1,13 +1,13 @@
 "use client";
 
-import { MoreVertical, Pin } from "lucide-react";
+import { Clock, MoreVertical, Pin, Trash2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-
 import {
   Card,
   CardContent,
   CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -20,11 +20,21 @@ import {
 import { ProjectItem } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Loader } from "@/components/loader";
-
 import { ProjectProgressBar } from "./project-progress-bar";
 import { TogglePinProjectAction } from "../projects/_actions/toggle-pin-project-action";
 import { deleteProjectAction } from "../projects/_actions/delete-project-action";
-import DeleteProjectAlert from "./delete-project-alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { timeAgo } from "@/lib/utils";
 
 interface ProjectCardProps {
   project: ProjectItem;
@@ -38,41 +48,47 @@ export const ProjectCard = ({
   completedTasks,
 }: ProjectCardProps) => {
   const router = useRouter();
+  const [isHovered, setIsHovered] = useState(false);
 
   const handleProjectCardClick = () => {
     router.push(`/projects/${project.id}`);
   };
 
-  const handleMoreClick = (event: React.MouseEvent) => {
-    event.stopPropagation();
-  };
-
   return (
     <Card
-      className="w-[300px] cursor-pointer hover:bg-gray-50"
+      className="group relative transition-all duration-300 hover:shadow-md cursor-pointer space-y-6 hover:ring-green-100 hover:ring-4"
       onClick={handleProjectCardClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
-      <CardHeader className="relative flex flex-col">
-        <CardTitle className="text-lg font-semibold">{project.title}</CardTitle>
-        <CardDescription className="text-sm mt-1 mb-2 overflow-hidden text-ellipsis">
-          {project.description && project?.description?.length > 50
-            ? `${project?.description.substring(0, 50)}...`
-            : project.description}
+      <CardHeader className="relative flex flex-col pb-2">
+        <CardTitle className="text-lg font-semibold line-clamp-1">
+          {project.title}
+        </CardTitle>
+        <CardDescription className="text-sm mt-1 mb-2 line-clamp-2">
+          {project.description}
         </CardDescription>
-        <span
-          onClick={handleMoreClick}
-          className="absolute right-4 top-4 p-2 cursor-pointer hover:bg-gray-100 rounded-lg"
+        <div
+          className={`absolute right-4 top-4 transition-opacity duration-300 ${
+            isHovered ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={(e) => e.stopPropagation()}
         >
           <CardOptions projectId={project.id} isPinned={project.isPinned} />
-        </span>
+        </div>
       </CardHeader>
-      <CardContent className="mt-4">
+      <CardContent>
         <ProjectProgressBar
           completedTasks={completedTasks}
           totalTasks={totalTasks}
-          lastUpdate={project.updatedAt}
         />
       </CardContent>
+      <CardFooter className="pt-0">
+        <div className="flex items-center text-sm text-gray-500">
+          <Clock className="mr-2 h-4 w-4" />
+          Last updated {timeAgo(project.updatedAt)}
+        </div>
+      </CardFooter>
     </Card>
   );
 };
@@ -86,7 +102,6 @@ const CardOptions = ({ projectId, isPinned }: CardOptionsProps) => {
   const [isPinTogglePending, startPinToggleTransition] = useTransition();
   const [isDeleteProjectPending, startDeleteProjectTransition] =
     useTransition();
-
   const [showPopover, setShowPopover] = useState(false);
 
   const handleMarkProjectAsPinned = async () => {
@@ -94,22 +109,34 @@ const CardOptions = ({ projectId, isPinned }: CardOptionsProps) => {
       startPinToggleTransition(async () => {
         const { success, error } = await TogglePinProjectAction(projectId);
         if (success) {
-          toast.success("Project pinned successfully!");
+          toast.success(
+            isPinned
+              ? "Project unpinned successfully!"
+              : "Project pinned successfully!"
+          );
         } else {
-          toast.error(error || "Failed to pin project");
+          toast.error(error || "Failed to update project pin status");
         }
       });
     } catch (error) {
-      toast.error((error as Error).message || "Failed to delete project");
+      toast.error(
+        (error as Error).message || "Failed to update project pin status"
+      );
     }
   };
 
   const handleDeleteProject = async () => {
     try {
       startDeleteProjectTransition(async () => {
+        await new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve("ok");
+          }, 2000);
+        });
         const { success, error } = await deleteProjectAction(projectId);
         if (success) {
-          toast.success("Project Deleted successfully!");
+          toast.success("Project deleted successfully!");
+          setShowPopover(false);
         } else {
           toast.error(error || "Failed to delete project");
         }
@@ -122,42 +149,66 @@ const CardOptions = ({ projectId, isPinned }: CardOptionsProps) => {
   return (
     <Popover open={showPopover} onOpenChange={setShowPopover}>
       <PopoverTrigger asChild>
-        <MoreVertical className="h-4 w-4" />
+        <Button variant="ghost" size="icon" className="h-8 w-8">
+          <MoreVertical className="h-4 w-4" />
+          <span className="sr-only">Project options</span>
+        </Button>
       </PopoverTrigger>
-      <PopoverContent
-        side="bottom"
-        className="w-[200px] space-y-2 flex flex-col"
-        onOpenAutoFocus={(e) => e.preventDefault()} // disable auto focus when visible
-      >
-        <Button
-          disabled={isPinTogglePending}
-          onClick={handleMarkProjectAsPinned}
-          className="flex gap-x-2 items-center justify-start p-1"
-          variant="ghost"
-        >
-          {isPinTogglePending ? (
-            <Loader />
-          ) : (
-            <>
-              <Pin className="h-4 w-4" />
-              <span>{isPinned ? "Unpin" : "Pin"}</span>
-            </>
-          )}
-        </Button>
-        <Button
-          disabled={isDeleteProjectPending}
-          variant="ghost"
-          className="flex gap-x-2 items-center justify-start text-red-500 hover:text-red-500 p-1"
-        >
-          {isDeleteProjectPending ? (
-            <Loader />
-          ) : (
-            <DeleteProjectAlert
-              onDelete={handleDeleteProject}
-              setShowPopover={setShowPopover}
-            />
-          )}
-        </Button>
+      <PopoverContent side="bottom" align="end" className="w-56 p-1">
+        <div className="flex flex-col space-y-2 p-2">
+          <Button
+            disabled={isPinTogglePending}
+            onClick={handleMarkProjectAsPinned}
+            className="justify-start gap-x-2 flex items-center"
+            variant="ghost"
+          >
+            {isPinTogglePending ? <Loader /> : <Pin className="mr-2 h-4 w-4" />}
+            {isPinned ? "Unpin" : "Pin"}
+          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild className="focus-visible::bg-red-500">
+              <Button
+                disabled={isDeleteProjectPending}
+                variant="destructive"
+                className="justify-start focus-visible::bg-red-500 gap-x-2 flex items-center"
+              >
+                {isDeleteProjectPending ? (
+                  <Loader />
+                ) : (
+                  <Trash2 className="mr-2 h-4 w-4" />
+                )}
+                {isDeleteProjectPending ? "Deleting..." : "Delete"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="space-y-12 p-8">
+              <AlertDialogHeader>
+                <AlertDialogTitle>
+                  Are you sure you want to delete this project?
+                </AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete the
+                  project and all associated tasks.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="w-full flex items-center justify-between">
+                <AlertDialogCancel className="w-full">Cancel</AlertDialogCancel>
+                <Button asChild variant={"destructive"} className="w-full">
+                  <AlertDialogAction
+                    onClick={handleDeleteProject}
+                    className="flex items-center gap-x-2"
+                  >
+                    {isDeleteProjectPending ? (
+                      <Loader />
+                    ) : (
+                      <Trash2 className="mr-2 h-4 w-4" />
+                    )}
+                    Delete
+                  </AlertDialogAction>
+                </Button>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </PopoverContent>
     </Popover>
   );

@@ -14,7 +14,7 @@ export const ProjectSearchInput = ({ handleOnSearch }: Props) => {
       <Input
         onChange={(e) => handleOnSearch(e.target.value)}
         type="search"
-        className="pl-10 flex-1 items-center justify-center max-w-2xl"
+        className="pl-10 flex-1 items-center justify-center"
         placeholder="Search projects..."
       />
       <SearchIcon className="absolute left-2 text-gray-200" />

@@ -11,7 +11,7 @@ const ShinyButton = forwardRef<HTMLAnchorElement, ShinyButtonProps>(
       <Link
         href={href ?? "#"}
         className={cn(
-          "group relative flex transform items-center justify-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-primary bg-brand-700 px-8 text-base/7 font-medium text-primary transition-all duration-300 hover:ring-2 hover:ring-green-700 hover:ring-offset-2 focus:outline-none focus:ring-2 focus:ring-offset-2",
+          "group relative flex transform items-center justify-center gap-2 overflow-hidden whitespace-nowrap rounded-md border border-primary bg-brand-700 px-8 text-base/7 font-medium text-primary transition-all duration-300 hover:ring-2 hover:ring-green-700 hover:ring-offset-2 focus:outline-none focus:ring-2 focus:ring-offset-2 focus-visible:ring-primary",
           className
         )}
         ref={ref}

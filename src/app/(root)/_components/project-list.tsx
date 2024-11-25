@@ -9,7 +9,6 @@ import { calculateProjectProgress } from "@/lib/utils";
 
 import { ProjectCard } from "./project-card";
 import { ProjectSearchInput } from "./project-search-input";
-import { CreateProjectSheet } from "./create-project-sheet";
 
 interface ProjectListProps {
   projects: ProjectItem[];
@@ -37,20 +36,18 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
 
   return (
     <div className="flex flex-col">
-      <div className="flex justify-between items-center gap-2">
-        <ProjectSearchInput handleOnSearch={handleOnSearch} />
-        <CreateProjectSheet />
-      </div>
+      {/* Search */}
+      <ProjectSearchInput handleOnSearch={handleOnSearch} />
 
+      {/* Pinned Projects */}
       <div className="space-y-4 mt-6">
         {pinnedProjects.length > 0 && (
           <>
-            <div className="flex items-center gap-x-2 border p-2 rounded-lg bg-gray-50">
+            <div className="mb-4 flex items-center gap-2 text-sm font-medium text-gray-600">
               <Pin className="h-4 w-4" />
-              <h2>Pinned projects</h2>
+              Pinned projects
             </div>
-
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3  gap-4">
               {pinnedProjects?.map((p) => {
                 const progressBar = calculateProjectProgress(p);
                 return (
@@ -65,14 +62,15 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
             </div>
           </>
         )}
+
+        {/* All Projects */}
         {otherProjects.length > 0 && (
           <>
-            <div className="flex text-primary items-center gap-x-2 border p-2 rounded-lg bg-gray-50">
-              <Layers className="h-4 w-4" />
-              <h2>Projects</h2>
-            </div>
+            <h2 className="mb-4 text-sm font-medium text-gray-600">
+              All projects
+            </h2>
 
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
               {otherProjects?.map((p) => {
                 const progressBar = calculateProjectProgress(p);
                 return (

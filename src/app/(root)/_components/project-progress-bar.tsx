@@ -1,17 +1,17 @@
+import { CardFooter } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { timeAgo } from "@/lib/utils";
+import { Clock } from "lucide-react";
 import React from "react";
 
 interface ProjectProgressBarProps {
   completedTasks: number;
   totalTasks: number;
-  lastUpdate: Date;
 }
 
 export const ProjectProgressBar = ({
   completedTasks,
   totalTasks,
-  lastUpdate,
 }: ProjectProgressBarProps) => {
   const percentage =
     totalTasks === 0 ? 0 : Math.floor((completedTasks / totalTasks) * 100);
@@ -25,7 +25,6 @@ export const ProjectProgressBar = ({
         </p>
       </div>
       <Progress value={percentage} />
-      <div className="text-sm">Last updated {timeAgo(lastUpdate)}</div>
     </div>
   );
 };

@@ -34,13 +34,16 @@ export default async function ProjectsPage() {
   }
 
   return (
-    <PageWrapper>
-      <Heading>
-        <User2Icon className="h-6 w-6 mr-2" />
-        Projects
-      </Heading>
+    <>
+      <div className="flex items-center justify-between">
+        <Heading>
+          <User2Icon className="h-6 w-6 mr-2" />
+          Projects
+        </Heading>
+        <CreateProjectSheet />
+      </div>
 
       <ProjectList projects={projects} />
-    </PageWrapper>
+    </>
   );
 }
