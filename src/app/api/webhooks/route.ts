@@ -87,7 +87,7 @@ export async function POST(req: Request) {
 
       // Update the Clerk metadata (store custom user ID in metadata)
       await client.users.updateUserMetadata(id, {
-        privateMetadata: {
+        publicMetadata: {
           role: user.role,
           appUserId: user.id,
         },

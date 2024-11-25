@@ -18,8 +18,9 @@ export const createProjectAction = async (
     /* It looks like there is a typo in the code. The line `console.log("Role: ", sessionClaimsrole);`
     should be corrected to `console.log("Role: ", sessionClaims.role);`. */
     console.log("Claims: ", sessionClaims);
-    console.log("Role: ", sessionClaims?.role);
-    console.log("App User ID: ", sessionClaims?.appUserId);
+    console.log("metadata: ", sessionClaims?.metadata);
+    console.log("Role: ", sessionClaims?.metadata?.role);
+    console.log("App User ID: ", sessionClaims?.metadata?.appUserId);
 
     if (!userId) {
       return { success: false, error: "Unauthorized: No user ID provided" };
