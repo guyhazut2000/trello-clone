@@ -7,7 +7,6 @@ import { redirect } from "next/navigation";
 import { getProjectsByUserId } from "@/data-access/project";
 import { CreateProjectAnimation } from "@/components/animations/create-project-animation";
 
-import { ProjectSearchInput } from "../_components/project-search-input";
 import { CreateProjectSheet } from "../_components/create-project-sheet";
 import { ProjectList } from "../_components/project-list";
 
@@ -15,7 +14,7 @@ export default async function ProjectsPage() {
   const { userId: ClerkUserId, sessionClaims } = auth();
   const appUserId = sessionClaims?.metadata.appUserId;
   if (!ClerkUserId || !appUserId) {
-    return { success: false, error: "Unauthorized: No user ID provided" };
+    return redirect("/");
   }
 
   const projects = await getProjectsByUserId(appUserId, {
@@ -38,10 +37,7 @@ export default async function ProjectsPage() {
         <User2Icon className="h-6 w-6 mr-2" />
         Your Projects
       </div>
-      <div className="flex justify-between items-center gap-2">
-        <ProjectSearchInput />
-        <CreateProjectSheet />
-      </div>
+
       <ProjectList projects={projects} />
     </div>
   );
