@@ -12,11 +12,13 @@ import { CreateProjectSheet } from "../_components/create-project-sheet";
 import { ProjectList } from "../_components/project-list";
 
 export default async function ProjectsPage() {
-  const { userId } = auth();
+  const { userId: ClerkUserId, sessionClaims } = auth();
+  const appUserId = sessionClaims?.metadata.appUserId;
+  if (!ClerkUserId || !appUserId) {
+    return { success: false, error: "Unauthorized: No user ID provided" };
+  }
 
-  if (!userId) redirect("/");
-
-  const projects = await getProjectsByUserId(userId, {
+  const projects = await getProjectsByUserId(appUserId, {
     sort: "updatedAt",
   });
 

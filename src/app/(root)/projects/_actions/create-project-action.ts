@@ -14,15 +14,10 @@ export const createProjectAction = async (
 ) => {
   try {
     // Authentication check (no throw, just return structured error response)
-    const { userId, sessionClaims } = auth();
-    /* It looks like there is a typo in the code. The line `console.log("Role: ", sessionClaimsrole);`
-    should be corrected to `console.log("Role: ", sessionClaims.role);`. */
-    console.log("Claims: ", sessionClaims);
-    console.log("metadata: ", sessionClaims?.metadata);
-    console.log("Role: ", sessionClaims?.metadata?.role);
-    console.log("App User ID: ", sessionClaims?.metadata?.appUserId);
+    const { userId: ClerkUserId, sessionClaims } = auth();
+    const appUserId = sessionClaims?.metadata.appUserId;
 
-    if (!userId) {
+    if (!ClerkUserId || !appUserId) {
       return { success: false, error: "Unauthorized: No user ID provided" };
     }
 
@@ -35,7 +30,7 @@ export const createProjectAction = async (
     const createProjectReturn = await createProject({
       title: validatedValues.data.title,
       description: validatedValues.data.description,
-      userId,
+      userId: appUserId,
     });
 
     const defaultProjectListsTitles = [
