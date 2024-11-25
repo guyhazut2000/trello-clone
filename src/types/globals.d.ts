@@ -7,9 +7,7 @@ export type Roles = UserRole;
 
 declare global {
   interface CustomJwtSessionClaims {
-    metadata: {
-      role: Roles;
-      appUserId: string;
-    };
+    role: Roles;
+    appUserId: string;
   }
 }

@@ -17,6 +17,7 @@ export const createProjectAction = async (
     const { userId, sessionClaims } = auth();
     /* It looks like there is a typo in the code. The line `console.log("Role: ", sessionClaimsrole);`
     should be corrected to `console.log("Role: ", sessionClaims.role);`. */
+    console.log("Claims: ", sessionClaims);
     console.log("Role: ", sessionClaims?.role);
     console.log("App User ID: ", sessionClaims?.appUserId);
 
