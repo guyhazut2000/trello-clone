@@ -31,7 +31,7 @@ export const getProjectsByUserId = async (
   return await prisma.project.findMany({
     where: {
       userId,
-      isPinned: isPinned !== undefined ? isPinned : false,
+      isPinned: isPinned !== undefined ? isPinned : undefined,
     },
     orderBy: {
       [sort]: order,
