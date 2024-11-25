@@ -13,15 +13,16 @@ export const createProjectAction = async (
   values: z.infer<typeof createProjectSchema>
 ) => {
   try {
+    // Authentication check (no throw, just return structured error response)
     const { userId } = auth();
-    console.log(userId);
+    if (!userId) {
+      return { success: false, error: "Unauthorized: No user ID provided" };
+    }
 
-    if (!userId) throw new Error("Unauthorized");
-
+    // Validation check (safeParse with structured error response)
     const validatedValues = createProjectSchema.safeParse(values);
-
     if (!validatedValues.success) {
-      throw new Error("Invalid values");
+      return { success: false, error: "Invalid input values" };
     }
 
     const createProjectReturn = await createProject({

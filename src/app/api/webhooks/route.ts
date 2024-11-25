@@ -1,6 +1,6 @@
 import { Webhook } from "svix";
 import { headers } from "next/headers";
-import { WebhookEvent } from "@clerk/nextjs/server";
+import { clerkClient, WebhookEvent } from "@clerk/nextjs/server";
 import prisma from "@/lib/db";
 
 export async function POST(req: Request) {
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
       const primaryPhone = phone_numbers?.[0]?.phone_number;
       const externalAccount = external_accounts?.[0];
 
-      await prisma.user.create({
+      const user = await prisma.user.create({
         data: {
           email: primaryEmail,
           name: `${first_name || ""} ${last_name || ""}`.trim(),
@@ -80,6 +80,15 @@ export async function POST(req: Request) {
           lastSignInAt: new Date(),
           createdAt: new Date(created_at),
           updatedAt: new Date(updated_at),
+        },
+      });
+
+      const client = clerkClient();
+
+      // Update the Clerk metadata (store custom user ID in metadata)
+      await client.users.updateUserMetadata(id, {
+        privateMetadata: {
+          appUserId: user.id, // Store the custom `userId` from your database
         },
       });
 
