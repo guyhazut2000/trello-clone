@@ -18,7 +18,6 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -30,6 +29,8 @@ import { SubmitButton } from "@/components/submit-button";
 
 import { createProjectSchema } from "../projects/validation";
 import { createProjectAction } from "../projects/_actions/create-project-action";
+import { ShinyButton } from "@/components/shiny-button";
+import { toast } from "sonner";
 
 export const CreateProjectSheet = () => {
   const [showSheet, setShowSheet] = useState(false);
@@ -37,16 +38,16 @@ export const CreateProjectSheet = () => {
   return (
     <Sheet open={showSheet} onOpenChange={setShowSheet}>
       <SheetTrigger asChild>
-        <Button className="flex items-center justify-center gap-x-2">
-          <PlusIcon className="w-4 h-4" />
-          Create Project
-        </Button>
+        <ShinyButton className="flex items-center justify-center gap-x-2">
+          Set Up Your New Project
+        </ShinyButton>
       </SheetTrigger>
       <SheetContent className="gap-4 flex flex-col">
-        <SheetHeader>
+        <SheetHeader className="mb-6">
           <SheetTitle>New Project Setup</SheetTitle>
           <SheetDescription>
-            Provide the necessary details to start your project.
+            Complete the form below to configure your project and kick-start
+            your next big idea.{" "}
           </SheetDescription>
         </SheetHeader>
         <CreateProjectForm setShowSheet={setShowSheet} />
@@ -79,6 +80,10 @@ const CreateProjectForm = ({ setShowSheet }: CreateProjectFormProps) => {
       if (success) {
         form.reset();
         setShowSheet(false);
+
+        toast.success("Project created successfully!");
+      } else {
+        toast.error("Failed to create project");
       }
     });
   };
@@ -121,6 +126,7 @@ const CreateProjectForm = ({ setShowSheet }: CreateProjectFormProps) => {
         />
         <SubmitButton
           pending={isPending}
+          disabled={isPending || !form.formState.isValid}
           idleText="Create Project"
           submittingText="Creating..."
         />

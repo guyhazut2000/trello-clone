@@ -47,9 +47,9 @@ export const ProjectList = ({ projects }: ProjectListProps) => {
       )}
       {otherProjects.length > 0 && (
         <>
-          <div className="flex items-center gap-x-2 border p-2 rounded-lg bg-gray-50">
+          <div className="flex text-primary items-center gap-x-2 border p-2 rounded-lg bg-gray-50">
             <Layers className="h-4 w-4" />
-            <h2>Other projects</h2>
+            <h2> projects</h2>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">

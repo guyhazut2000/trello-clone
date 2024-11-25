@@ -22,6 +22,24 @@ export const getProjects = async (options?: GetProjectOptions) => {
   });
 };
 
+export const getProjectsByUserId = async (
+  userId: string,
+  options?: GetProjectOptions
+) => {
+  const { order = "desc", sort = "updatedAt", isPinned } = options || {};
+
+  return await prisma.project.findMany({
+    where: {
+      userId,
+      isPinned: isPinned !== undefined ? isPinned : false,
+    },
+    orderBy: {
+      [sort]: order,
+    },
+    include: { lists: { include: { tasks: true } } }, // Include related lists and tasks
+  });
+};
+
 export const getProjectById = async (projectId: string) => {
   return await prisma.project.findUnique({
     where: { id: projectId },
@@ -31,7 +49,11 @@ export const getProjectById = async (projectId: string) => {
 
 export const createProject = async (project: CreateProjectBody) => {
   return await prisma.project.create({
-    data: project,
+    data: {
+      userId: project.userId,
+      title: project.title,
+      description: project.description,
+    },
     include: { lists: true },
   });
 };

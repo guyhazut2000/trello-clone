@@ -40,13 +40,11 @@ const SidebarItem = ({ route }: SidebarItemProps) => {
       className={`flex items-center space-x-2 w-full rounded-lg px-2 py-1 cursor-pointer select-none 
         ${
           isActive
-            ? "bg-blue-100 text-blue-400"
-            : "hover:bg-gray-100 text-gray-500"
+            ? "bg-primary text-primary-foreground"
+            : "hover:bg-green-200 text-black"
         }`}
     >
-      <Icon
-        className={`h-5 w-5 ${isActive ? "text-blue-400" : "text-gray-500"}`}
-      />
+      <Icon className={`h-4 w-4 ${isActive ? "text-white" : "text-primary"}`} />
       <span>{route.name}</span>
     </Link>
   );

@@ -12,6 +12,7 @@ interface SubmitButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   submittingText: string;
   pending: boolean;
 }
+
 export function SubmitButton({
   idleText,
   submittingText,
@@ -21,11 +22,8 @@ export function SubmitButton({
   return (
     <Button
       {...props}
-      className={cn(
-        "disabled:bg-gray-400 disabled:cursor-default w-full",
-        props.className
-      )}
-      disabled={pending}
+      className={cn("w-full", props.className)}
+      disabled={props.disabled || pending}
     >
       {pending ? (
         <div className="flex justify-center items-center gap-2">

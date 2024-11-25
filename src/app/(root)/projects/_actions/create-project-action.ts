@@ -14,6 +14,7 @@ export const createProjectAction = async (
 ) => {
   try {
     const { userId } = auth();
+    console.log(userId);
 
     if (!userId) throw new Error("Unauthorized");
 

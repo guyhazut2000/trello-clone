@@ -52,9 +52,13 @@ export const ProjectCard = ({
       className="w-[300px] cursor-pointer hover:bg-gray-50"
       onClick={handleProjectCardClick}
     >
-      <CardHeader className="relative">
-        <CardTitle>{project.title}</CardTitle>
-        <CardDescription>{project.description}</CardDescription>
+      <CardHeader className="relative flex flex-col">
+        <CardTitle className="text-lg font-semibold">{project.title}</CardTitle>
+        <CardDescription className="text-sm mt-1 mb-2 overflow-hidden text-ellipsis">
+          {project.description && project?.description?.length > 50
+            ? `${project?.description.substring(0, 50)}...`
+            : project.description}
+        </CardDescription>
         <span
           onClick={handleMoreClick}
           className="absolute right-4 top-4 p-2 cursor-pointer hover:bg-gray-100 rounded-lg"
@@ -62,7 +66,7 @@ export const ProjectCard = ({
           <CardOptions projectId={project.id} isPinned={project.isPinned} />
         </span>
       </CardHeader>
-      <CardContent>
+      <CardContent className="mt-4">
         <ProjectProgressBar
           completedTasks={completedTasks}
           totalTasks={totalTasks}
