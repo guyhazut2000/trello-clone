@@ -12,16 +12,16 @@ const priorityClasses: Record<
   keyof typeof TaskPriority,
   { bg: string; text: string }
 > = {
-  LOW: { bg: "bg-green-50", text: "text-green-500" },
-  MEDIUM: { bg: "bg-yellow-50", text: "text-yellow-500" },
-  HIGH: { bg: "bg-red-50", text: "text-red-500" },
+  LOW: { bg: "bg-green-100", text: "text-green-500" },
+  MEDIUM: { bg: "bg-yellow-100", text: "text-yellow-500" },
+  HIGH: { bg: "bg-red-100", text: "text-red-500" },
 };
 
 const typeClasses: Record<keyof typeof TaskType, { bg: string; text: string }> =
   {
-    TASK: { bg: "bg-blue-50", text: "text-blue-500" },
-    BUG: { bg: "bg-orange-50", text: "text-orange-500" },
-    FEATURE: { bg: "bg-purple-50", text: "text-purple-500" },
+    TASK: { bg: "bg-blue-100", text: "text-blue-500" },
+    BUG: { bg: "bg-orange-100", text: "text-orange-500" },
+    FEATURE: { bg: "bg-purple-100", text: "text-purple-500" },
   };
 
 export default function TaskBadge({ priority, type }: TaskBadgeProps) {
@@ -33,13 +33,13 @@ export default function TaskBadge({ priority, type }: TaskBadgeProps) {
   const typeClass = type ? typeClasses[type] : undefined;
 
   // Combine background and text color classes based on priority and type
-  const bgClass = priorityClass?.bg || typeClass?.bg || "bg-gray-50";
+  const bgClass = priorityClass?.bg || typeClass?.bg || "bg-gray-100";
   const textClass = priorityClass?.text || typeClass?.text || "text-gray-500";
 
   return (
     <Badge
       variant={"secondary"}
-      className={clsx(bgClass, textClass, "font-bold px-3 py-1 rounded-md")}
+      className={clsx(bgClass, textClass, "px-3  rounded-full")}
     >
       {priority && <span>{priority}</span>}
       {priority && type && " | "}

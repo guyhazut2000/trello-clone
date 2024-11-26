@@ -25,10 +25,10 @@ export const CreateTaskSheet = ({ projectId }: CreateTaskSheetProps) => {
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
       <SheetTrigger asChild>
-        <Button variant={"outline"}>
+        <Button size={"sm"}>
           <div className="flex gap-x-2 items-center justify-start">
             <PlusIcon className="w-4 h-4" />
-            Create new Task
+            Add Task
           </div>
         </Button>
       </SheetTrigger>

@@ -5,6 +5,7 @@ import { Droppable, Draggable } from "@hello-pangea/dnd";
 import { ListItem } from "@/types";
 import { cn, sortTasksByPosition } from "@/lib/utils";
 import { ProjectTask } from "./project-task";
+import { CalendarX, Clock, ListTodo } from "lucide-react";
 
 interface ProjectListProps {
   list: ListItem;
@@ -17,19 +18,29 @@ export const ProjectList = ({ list, index }: ProjectListProps) => {
       {(provided, snapshot) => (
         <div
           className={cn(
-            "rounded-lg shadow-md flex flex-col gap-3 p-4 transition-all duration-300 ease-in-out hover:shadow-lg",
-            snapshot.isDragging
-              ? "bg-gray-200 scale-105 shadow-lg"
-              : "bg-gray-50"
+            "rounded-lg flex flex-col gap-3 p-4 transition-all duration-300 ease-in-out hover:shadow-lg hover:ring-4 hover:ring-gray-200",
+            snapshot.isDragging ? "bg-gray-200 scale-105 shadow-lg" : ""
           )}
           ref={provided.innerRef}
           {...provided.draggableProps}
           {...provided.dragHandleProps}
         >
-          <div className="flex justify-between items-center">
-            <h3 className="font-semibold text-lg text-gray-800 flex justify-center items-center gap-x-2">
+          <div className="flex justify-start gap-x-2 items-center">
+            {list.title === "To Do" && (
+              <ListTodo className="w-5 h-5 text-gray-500" />
+            )}
+            {list.title === "In Progress" && (
+              <Clock className="w-5 h-5 text-blue-500" />
+            )}
+            {list.title === "Completed" && (
+              <ListTodo className="w-5 h-5 text-green-500" />
+            )}
+            {list.title === "Backlog" && (
+              <CalendarX className="w-5 h-5 text-red-500" />
+            )}
+            <h3 className="text-gray-800 flex justify-center items-center gap-x-2">
               {list.title}
-              <span className="select-none bg-gray-200 rounded-md px-3 py-1">
+              <span className="select-none bg-gray-100 px-2 rounded-full py-1">
                 {list.tasks.length}
               </span>
             </h3>

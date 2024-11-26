@@ -24,6 +24,8 @@ import { TaskItem } from "@/types";
 
 import { EditTaskForm } from "./edit-task-form";
 import { DeleteTaskSheet } from "./delete-task-sheet";
+import { TaskStatus } from "@prisma/client";
+import clsx from "clsx";
 
 interface EditTaskSheetProps {
   task: TaskItem;
@@ -36,18 +38,21 @@ export const EditTaskSheet = ({ task }: EditTaskSheetProps) => {
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
       <SheetTrigger asChild>
-        <div className="flex flex-col justify-center p-2 w-full">
+        <div className="flex flex-col justify-center w-full">
           <div className="p-2 py-4 flex items-center space-x-2 justify-between w-full cursor-pointer">
             <span className="truncate text-gray-700">{task.title}</span>
-            <ChevronRight className="w-4 h-4 text-gray-400 flex-shrink-0 transform transition-transform duration-200 ease-in-out group-hover:translate-x-1" />
           </div>
           <div className="flex gap-x-2">
-            <TaskBadge priority={task.priority} />
+            <TaskBadge  priority={task.priority} />
             <TaskBadge type={task.type} />
           </div>
         </div>
       </SheetTrigger>
-      <SheetContent className="w-screen md:w-full">
+      <SheetContent
+        className="w-screen md:w-full space-y-4"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+        onCloseAutoFocus={(e) => e.preventDefault()}
+      >
         <SheetHeader className="w-full">
           <div className="flex flex-row w-full justify-between items-center">
             <SheetTitle>Edit task</SheetTitle>
@@ -63,7 +68,9 @@ export const EditTaskSheet = ({ task }: EditTaskSheetProps) => {
               />
             </div>
           </div>
-          <SheetDescription>Here you can edit your task</SheetDescription>
+          <SheetDescription className="py-2">
+            Make changes to your task here. Click save when you're done.
+          </SheetDescription>
         </SheetHeader>
 
         <EditTaskForm task={task} setSheetOpen={setSheetOpen} />

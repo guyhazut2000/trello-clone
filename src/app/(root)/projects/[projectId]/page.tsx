@@ -11,6 +11,8 @@ import { Label } from "@/components/ui/label";
 import { ProjectLists } from "../_components/project-lists";
 import { shortenString } from "@/lib/utils";
 import { CreateTaskSheet } from "../_components/create-task-sheet";
+import { Heading } from "@/components/heading";
+import { TaskSearchInput } from "../_components/task-search-input";
 
 type Props = {
   params: { projectId: string };
@@ -43,26 +45,17 @@ export default async function ProjectPage({
 
   return (
     <div className="flex flex-col space-y-6 py-6 w-full px-4 sm:px-6 lg:px-8">
-      <div className="flex flex-row justify-between items-center w-full">
-        <h2 className="font-bold text-3xl text-gray-800 transition-all duration-300 ease-in-out hover:text-gray-600">
-          {project?.title}
-        </h2>
+      <div className="flex w-full justify-between items-center">
+        <div className="flex flex-col w-1/2 space-y-1">
+          <Heading className="font-bold text-3xl text-gray-800 transition-all duration-300 ease-in-out hover:text-gray-600">
+            {project?.title}
+          </Heading>
+          <p className="text-gray-500 text-sm">{project?.description}</p>
+        </div>
+        <CreateTaskSheet projectId={params.projectId} />
       </div>
 
-      <div className="flex flex-col gap-6 bg-white shadow-lg rounded-lg p-6">
-        <div className="space-y-2">
-          <Label className="text-lg font-semibold text-gray-700">
-            Description:
-          </Label>
-          <p className="text-gray-600">{project?.description}</p>
-        </div>
-        <div className="flex gap-2 items-center justify-between border-t border-gray-200 pt-4">
-          <div className="flex gap-x-2 items-center text-gray-700">
-            <ListTodo className="w-5 h-5" />
-            <span className="font-medium">Work Items</span>
-          </div>
-          <CreateTaskSheet projectId={params.projectId} />
-        </div>
+      <div className="flex flex-col gap-6 bg-white rounded-lg">
         <section className="mt-6">
           <ProjectLists
             initialLists={project.lists}

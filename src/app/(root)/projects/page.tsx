@@ -9,7 +9,6 @@ import { CreateProjectAnimation } from "@/components/animations/create-project-a
 
 import { CreateProjectSheet } from "../_components/create-project-sheet";
 import { ProjectList } from "../_components/project-list";
-import { PageWrapper } from "@/components/page-wrapper";
 import { Heading } from "@/components/heading";
 
 export default async function ProjectsPage() {

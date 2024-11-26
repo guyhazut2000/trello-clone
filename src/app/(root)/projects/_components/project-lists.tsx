@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { DragDropContext, Droppable, DropResult } from "@hello-pangea/dnd";
 import { ListItem } from "@/types";
 import { toast } from "sonner";
@@ -9,6 +9,7 @@ import { updateListOrderAction } from "../_actions/update-list-order-action";
 import { updateTaskOrderAction } from "../_actions/update-task-order-action";
 import { updateTaskAction } from "../../tasks/_actions/update-task-action";
 import { ProjectList } from "./project-list";
+import { TaskSearchInput } from "./task-search-input";
 
 interface ProjectListsProps {
   initialLists: ListItem[];
@@ -20,6 +21,7 @@ export const ProjectLists = ({
   projectId,
 }: ProjectListsProps) => {
   const [lists, setLists] = useState(initialLists);
+  const [searchTerm, setSearchTerm] = useState("");
 
   const reorder = useCallback(
     (list: any[], startIndex: number, endIndex: number) => {
@@ -183,30 +185,44 @@ export const ProjectLists = ({
     }
   };
 
+  const handleOnSearch = (term: string) => {
+    setSearchTerm(term);
+  };
+
   return (
-    <DragDropContext onDragEnd={handleDragEnd}>
-      <Droppable droppableId="project-lists" direction="horizontal" type="LIST">
-        {(provided) => (
-          <div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-            ref={provided.innerRef}
-            {...provided.droppableProps}
-          >
-            {initialLists.length > 0 ? (
-              initialLists
-                .sort(sortListByPosition)
-                .map((list, index) => (
-                  <ProjectList key={list.id} list={list} index={index} />
-                ))
-            ) : (
-              <div className="col-span-full flex justify-center">
-                You have no lists
-              </div>
-            )}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <div className="flex flex-col space-y-4">
+      {/* Search, Filter */}
+      <div>
+        <TaskSearchInput handleOnSearch={handleOnSearch} />
+      </div>
+      <DragDropContext onDragEnd={handleDragEnd}>
+        <Droppable
+          droppableId="project-lists"
+          direction="horizontal"
+          type="LIST"
+        >
+          {(provided) => (
+            <div
+              className="bg-gray-50 mt-4 rounded grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+              ref={provided.innerRef}
+              {...provided.droppableProps}
+            >
+              {initialLists.length > 0 ? (
+                initialLists
+                  .sort(sortListByPosition)
+                  .map((list, index) => (
+                    <ProjectList key={list.id} list={list} index={index} />
+                  ))
+              ) : (
+                <div className="col-span-full flex justify-center">
+                  You have no lists
+                </div>
+              )}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    </div>
   );
 };

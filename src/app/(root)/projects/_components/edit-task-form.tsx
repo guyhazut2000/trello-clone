@@ -30,6 +30,8 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { editTaskAction } from "../_actions/edit-task-action";
 import { editTaskSchema } from "../validation";
+import { SheetClose } from "@/components/ui/sheet";
+import { Button } from "@/components/ui/button";
 
 interface EditTaskFormProps {
   task: TaskItem;
@@ -78,7 +80,7 @@ export const EditTaskForm = ({ task, setSheetOpen }: EditTaskFormProps) => {
   return (
     <Form {...form}>
       <form
-        className="space-y-8 w-full "
+        className="space-y-8 w-full"
         onSubmit={form.handleSubmit(handleEditTask)}
       >
         <FormField
@@ -88,14 +90,14 @@ export const EditTaskForm = ({ task, setSheetOpen }: EditTaskFormProps) => {
             <FormItem>
               <FormLabel>Title</FormLabel>
               <FormControl>
-                <Input {...field} />
+                <Input {...field} autoFocus />
               </FormControl>
 
               <FormMessage />
             </FormItem>
           )}
         />
-        <div className="flex flex-col gap-4 md:gap-0 md:flex-row gap-x-2 justify-between ">
+        <div className="grid grid-cols-2 gap-4">
           <FormField
             control={form.control}
             name="status"
@@ -203,11 +205,16 @@ export const EditTaskForm = ({ task, setSheetOpen }: EditTaskFormProps) => {
           )}
         />
 
-        <SubmitButton
-          idleText="Edit Task"
-          pending={isPending}
-          submittingText="editing..."
-        />
+        <div className="flex justify-end gap-2">
+          <Button asChild variant={"outline"}>
+            <SheetClose>Cancel</SheetClose>
+          </Button>
+          <SubmitButton
+            idleText="Save Changes"
+            pending={isPending}
+            submittingText="Saving..."
+          />
+        </div>
       </form>
     </Form>
   );
