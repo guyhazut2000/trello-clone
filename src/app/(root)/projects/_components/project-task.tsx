@@ -39,6 +39,20 @@ const getTaskStatusColor = (status: TaskStatus) => {
       return "hover:bg-gray-50";
   }
 };
+const getTaskStatusOnDragColor = (status: TaskStatus) => {
+  switch (status) {
+    case TaskStatus.BACKLOG:
+      return "bg-orange-50";
+    case TaskStatus.IN_PROGRESS:
+      return "bg-blue-50";
+    case TaskStatus.TODO:
+      return "bg-gray-50";
+    case TaskStatus.COMPLETED:
+      return "bg-green-50";
+    default:
+      return "bg-gray-50";
+  }
+};
 
 interface ProjectTaskProps {
   task: TaskItem;
@@ -58,7 +72,7 @@ export const ProjectTask = ({ task, index }: ProjectTaskProps) => {
               task.status
             )} ${getTaskStatusColor(task.status)} ${
               snapshot.isDragging
-                ? "bg-green-100 scale-105 shadow-xl"
+                ? getTaskStatusOnDragColor(task.status)
                 : "bg-white"
             }`
           )}
