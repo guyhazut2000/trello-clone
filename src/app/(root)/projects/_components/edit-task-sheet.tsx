@@ -43,7 +43,7 @@ export const EditTaskSheet = ({ task }: EditTaskSheetProps) => {
             <span className="truncate text-gray-700">{task.title}</span>
           </div>
           <div className="flex gap-x-2">
-            <TaskBadge  priority={task.priority} />
+            <TaskBadge priority={task.priority} />
             <TaskBadge type={task.type} />
           </div>
         </div>
@@ -69,7 +69,7 @@ export const EditTaskSheet = ({ task }: EditTaskSheetProps) => {
             </div>
           </div>
           <SheetDescription className="py-2">
-            Make changes to your task here. Click save when you're done.
+            Make changes to your task here. Click save when you&apos;re done.
           </SheetDescription>
         </SheetHeader>
 
